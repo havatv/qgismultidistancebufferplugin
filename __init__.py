@@ -22,9 +22,7 @@
 """
 
 
-
-
 def classFactory(iface):
-    # load GroupStats class from file GroupStats
+    # load MultiDistanceBuffer class from file MultiDistanceBuffer
     from MultiDistanceBuffer import MultiDistanceBuffer
     return MultiDistanceBuffer(iface)

@@ -19,9 +19,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os, glob
-import tempfile
-import uuid
 from PyQt4 import QtCore
 from PyQt4.QtCore import QCoreApplication, QVariant
 #from qgis.core import *
@@ -51,7 +48,8 @@ class Worker(QtCore.QObject):
     # Signal for sending over the result:
     finished = QtCore.pyqtSignal(bool, object)
 
-    def __init__(self, inputvectorlayer, inputvectorlayerpath, buffersizes, outputlayername, selectedonly, tempfilepath):
+    def __init__(self, inputvectorlayer, inputvectorlayerpath, buffersizes,
+                               outputlayername, selectedonly, tempfilepath):
         """Initialise.
 
         Arguments:
@@ -92,9 +90,6 @@ class Worker(QtCore.QObject):
         # progressbar - set early in run()
         self.increment = self.worktodo // 1000
         # Directories and files
-        self.tmpdir = tempfile.gettempdir()
-        #self.layercopypath = self.tmpdir + '/MDBcopy.shp'
-        #self.tmpbuffbasename = self.tmpdir + '/outbuff'
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         self.ringpath = self.tempfilepath + 'rings.shp'
 
@@ -128,18 +123,19 @@ class Worker(QtCore.QObject):
                 ok = QgsGeometryAnalyzer().buffer(layercopy,
                                 outbuffername, dist, False, True, -1)
                 layername = 'buff' + str(dist)
-                bufflayer = QgsVectorLayer(outbuffername,layername, "ogr")
+                bufflayer = QgsVectorLayer(outbuffername, layername, "ogr")
                 for feature in bufflayer.getFeatures():
-                    attrs = { 0 : dist }
+                    attrs = {0: dist}
                     bufflayer.dataProvider().changeAttributeValues(
-                                           { feature.id() : attrs })
+                                           {feature.id(): attrs})
                 outbuffers.append(outbuffername)
                 outbufferlayers.append(bufflayer)
                 bufflayer = None
                 self.calculate_progress()
             # Make a copy for the rings
             error = QgsVectorFileWriter.writeAsVectorFormat(outbufferlayers[0],
-                    self.ringpath, outbufferlayers[0].dataProvider().encoding(),
+                    self.ringpath,
+                    outbufferlayers[0].dataProvider().encoding(),
                     None, "ESRI Shapefile")
             ringlayer = QgsVectorLayer(self.ringpath, 'rings', "ogr")
             self.status.emit('Merging')
@@ -148,7 +144,7 @@ class Worker(QtCore.QObject):
                     continue  # We already have this one included
                 for outerfeature in outbufferlayers[j].getFeatures():
                     outergeom = outerfeature.geometry()
-                    for innerfeature in outbufferlayers[j-1].getFeatures():
+                    for innerfeature in outbufferlayers[j - 1].getFeatures():
                         innergeom = innerfeature.geometry()
                         newgeom = outergeom.symDifference(innergeom)
                         outergeom = newgeom
@@ -159,8 +155,10 @@ class Worker(QtCore.QObject):
             # Create a memory layer for the result:
             # Prepare the string describing the geometry
             layeruri = 'Polygon?'
-            layeruri = layeruri + 'crs=' + str(ringlayer.dataProvider().crs().authid())
-            memresult = QgsVectorLayer(layeruri, self.outputlayername, "memory")
+            layeruri = (layeruri + 'crs=' +
+                        str(ringlayer.dataProvider().crs().authid()))
+            memresult = QgsVectorLayer(layeruri, self.outputlayername,
+                                                              "memory")
             #memresult.startEditing()
             for ringfield in ringlayer.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([ringfield])
@@ -193,7 +191,7 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
-                    
+
     def calculate_progress(self):
         '''Update progress and emit a signal with the percentage'''
         self.processed = self.processed + 1
@@ -210,7 +208,7 @@ class Worker(QtCore.QObject):
         self.abort = True
 
     def tr(self, message):
-        """Get the translation for a string using Qt translation API.
+        '''Get the translation for a string using Qt translation API.
 
         We implement this ourselves since we do not inherit QObject.
 
@@ -219,7 +217,6 @@ class Worker(QtCore.QObject):
 
         :returns: Translated version of message.
         :rtype: QString
-        """
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+        '''
+        # noinspection PyTypeChecker, PyArgumentList, PyCallByClass
         return QCoreApplication.translate('NNJoinEngine', message)
-

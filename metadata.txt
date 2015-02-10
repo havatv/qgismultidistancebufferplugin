@@ -19,15 +19,16 @@ qgisMinimumVersion=2.0
 # Optional items:
 
 # Uncomment the following line and add your changelog entries:
-# changelog=
+changelog=0.0.1
+    - initial version, using QgsGeometryAnalyzer.buffer
 
 # tags are comma separated with spaces allowed
-tags=buffer,multiple,multi,distance,vector,ring
+tags=buffer,multiple,multi,distance,vector,ring,zone
 category=Vector
 
-#homepage=http://hub.qgis.org/projects/multidistancebuffer
-#tracker=https://github.com/havatv/qgismultidistancebufferplugin/issues
-#repository=http://plugins.qgis.org/plugins/plugins.xml
+homepage=http://hub.qgis.org/projects/multidistancebuffer
+tracker=https://github.com/havatv/qgismultidistancebufferplugin/issues
+repository=https://github.com/havatv/qgismultidistancebufferplugin.git
 icon=icon.png
 # experimental flag
 experimental=False

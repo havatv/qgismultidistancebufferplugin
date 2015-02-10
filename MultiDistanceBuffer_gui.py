@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os, glob
+import os
+import glob
 import sys
 import tempfile
 import uuid
@@ -22,6 +23,7 @@ from MultiDistanceBuffer_engine import Worker
 FORM_CLASS, _ = uic.loadUiType(join(
     dirname(__file__), 'ui_multidistancebuffer.ui'))
 
+
 class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 #class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent=None):
@@ -42,10 +44,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         cancelButton.setText(self.CANCEL)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
-        # Connect the user interface signals        
-        QObject.connect(self.addButton,SIGNAL("clicked()"), self.addDistance)
-        QObject.connect(self.removeButton,SIGNAL("clicked()"), self.removeDistance)
-        QObject.connect(self.bufferSB,SIGNAL("editingFinished()"), self.addDistanceEnter)
+        # Connect the user interface signals
+        QObject.connect(self.addButton, SIGNAL("clicked()"),
+                                            self.addDistance)
+        QObject.connect(self.removeButton, SIGNAL("clicked()"),
+                                            self.removeDistance)
+        QObject.connect(self.bufferSB, SIGNAL("editingFinished()"),
+                                              self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
         cancelButton.clicked.connect(self.killWorker)
@@ -83,7 +88,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                                  str(bufferdistances),
                                  self.MULTIDISTANCEBUFFER,
                                  QgsMessageLog.INFO)
-        worker = Worker(layercopy, self.layercopypath, bufferdistances, outputlayername, selectedonly, tempfilepathprefix)
+        worker = Worker(layercopy, self.layercopypath, bufferdistances,
+                      outputlayername, selectedonly, tempfilepathprefix)
         thread = QThread(self)
         worker.moveToThread(thread)
         worker.finished.connect(self.workerFinished)
@@ -98,8 +104,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
         layercopy = None
-        
-    
+
     def workerFinished(self, ok, ret):
         """Handles the output from the worker and cleans up after the
            worker has finished."""
@@ -108,21 +113,23 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.thread.quit()
         self.thread.wait()
         self.thread.deleteLater()
-        # Remove temporary files (errors out on Windows - used by another process)
+        # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
             tmpfiles = glob.glob(copypattern)
             for tmpfile in tmpfiles:
                 os.remove(tmpfile)
         except:
-            QgsMessageLog.logMessage('Info: Unable to delete temporary files...',
-                                self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
+            QgsMessageLog.logMessage(
+                           'Info: Unable to delete temporary files...',
+                           self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
 
         if ok and ret is not None:
             # report the result
             result_layer = ret
             QgsMessageLog.logMessage(self.tr('MultiDistanceBuffer finished'),
-                                     self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
+                                     self.MULTIDISTANCEBUFFER,
+                                     QgsMessageLog.INFO)
             result_layer.dataProvider().updateExtents()
             result_layer.commitChanges()
             self.layerlistchanging = True
@@ -140,12 +147,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
-        
+
     def workerError(self, exception_string):
         """Report an error from the worker."""
         #QgsMessageLog.logMessage(self.tr('Worker failed - exception') +
-        #                         ': ' + str(exception_string), self.MULTIDISTANCEBUFFER,
-        #                         QgsMessageLog.CRITICAL)
+        #                                  ': ' + str(exception_string),
+        #                                      self.MULTIDISTANCEBUFFER,
+        #                                        QgsMessageLog.CRITICAL)
         self.showError(exception_string)
 
     def workerInfo(self, message_string):
@@ -157,7 +165,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Kill the worker thread."""
         if self.worker is not None:
             QgsMessageLog.logMessage(self.tr('Killing worker'),
-                                     self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
+                                     self.MULTIDISTANCEBUFFER,
+                                     QgsMessageLog.INFO)
             self.worker.kill()
 
     def showError(self, text):
@@ -178,14 +187,15 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def reject(self):
         """Reject override."""
         # exit the dialog
-        # Remove temporary files (errors out on Windows - used by another process)
+        # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
             tmpfiles = glob.glob(copypattern)
             for tmpfile in tmpfiles:
                 os.remove(tmpfile)
         except:
-            QgsMessageLog.logMessage('Info: Unable to delete temporary files...',
+            QgsMessageLog.logMessage(
+                                'Info: Unable to delete temporary files...',
                                 self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
         QDialog.reject(self)
 
@@ -200,7 +210,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 return
             else:
                 # Maintain a sorted list of distances
-                if float(self.listModel.item(i).text()) > float(str(self.bufferSB.value())):
+                if (float(self.listModel.item(i).text()) >
+                                 float(str(self.bufferSB.value()))):
                     item = QStandardItem(str(self.bufferSB.value()))
                     self.listModel.insertRow(i, item)
                     return
@@ -218,12 +229,14 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Check if the value is already in the list
             if self.listModel.item(i).text() == str(self.bufferSB.value()):
                 #QgsMessageLog.logMessage('Add Distance Enter: Duplicate ' +
-                #        self.listModel.item(i).text(), self.MULTIDISTANCEBUFFER,
+                #        self.listModel.item(i).text(),
+                #             self.MULTIDISTANCEBUFFER,
                 #        QgsMessageLog.INFO)
                 return
             else:
                 # Maintain a sorted list of distances
-                if float(self.listModel.item(i).text()) > float(str(self.bufferSB.value())):
+                if (float(self.listModel.item(i).text()) >
+                        float(str(self.bufferSB.value()))):
                     item = QStandardItem(str(self.bufferSB.value()))
                     self.listModel.insertRow(i, item)
                     return
@@ -231,12 +244,12 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.listModel.appendRow(item)
 
     def removeDistance(self):
-        self.bufferList.setUpdatesEnabled(False);
-        indexes = self.bufferList.selectedIndexes();
-        indexes.sort();
-        for i in range(len(indexes)-1, -1, -1):
-            self.listModel.removeRow(indexes[i].row());
-        self.bufferList.setUpdatesEnabled(True);
+        self.bufferList.setUpdatesEnabled(False)
+        indexes = self.bufferList.selectedIndexes()
+        indexes.sort()
+        for i in range(len(indexes) - 1, -1, -1):
+            self.listModel.removeRow(indexes[i].row())
+        self.bufferList.setUpdatesEnabled(True)
 
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
