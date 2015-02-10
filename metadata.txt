@@ -26,7 +26,7 @@ tags=buffer,multiple,multi,distance,vector,ring
 category=Vector
 
 #homepage=http://hub.qgis.org/projects/multidistancebuffer
-#tracker=http://hub.qgis.org/projects/multidistancebuffer/issues
+#tracker=https://github.com/havatv/qgismultidistancebufferplugin/issues
 #repository=http://plugins.qgis.org/plugins/plugins.xml
 icon=icon.png
 # experimental flag
