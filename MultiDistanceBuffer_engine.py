@@ -19,8 +19,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4 import QtCore
-from PyQt4.QtCore import QCoreApplication, QVariant
 #from qgis.core import *
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
@@ -30,8 +28,9 @@ from qgis.core import QgsMapLayer, QgsExpression, QgsVectorFileWriter
 from qgis.analysis import QgsGeometryAnalyzer, QgsOverlayAnalyzer
 from processing.core.Processing import Processing
 import processing
-
 #from processing import *
+from PyQt4 import QtCore
+from PyQt4.QtCore import QCoreApplication, QVariant
 
 
 class Worker(QtCore.QObject):

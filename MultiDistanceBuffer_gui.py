@@ -7,11 +7,11 @@ import tempfile
 import uuid
 from os.path import dirname
 from os.path import join
+from qgis.core import *
+from qgis.gui import *
 from PyQt4 import uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
-from qgis.gui import *
 import pickle
 from math import *
 import os
