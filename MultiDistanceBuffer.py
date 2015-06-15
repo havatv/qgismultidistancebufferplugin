@@ -35,22 +35,48 @@ class MultiDistanceBuffer:
     def __init__(self, iface):
         # Save reference to the QGIS interface
         self.iface = iface
-        # Create the dialog and keep reference
-        self.dlg = MultiDistanceBufferDialog(self.iface)
+
+        pluginPath = QFileInfo(os.path.realpath(__file__)).path()
+
+        # initialize locale using the QGIS locale
+        locale = QSettings().value('locale/userLocale')[0:2]
+        if QFileInfo(pluginPath).exists():
+            self.localePath = os.path.join(
+               pluginPath,
+               'i18n',
+               '{}.qm'.format(locale))
 
         # initialize locale
-        pluginPath = QFileInfo(os.path.realpath(__file__)).path()
-        localeName = QLocale.system().name()
+        #localeName = QLocale.system().name()
 
-        if QFileInfo(pluginPath).exists():
-            self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
-                               + localeName + ".qm")
+        #if QFileInfo(pluginPath).exists():
+        #    self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
+        #                       + localeName + ".qm")
 
         if QFileInfo(self.localePath).exists():
             self.translator = QTranslator()
             self.translator.load(self.localePath)
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
+        # Create the dialog and keep reference
+        self.dlg = MultiDistanceBufferDialog(self.iface)
+
+        self.menu = self.tr(u'&Multiple Distance Buffer')
+
+    # noinspection PyMethodMayBeStatic
+    def tr(self, message):
+        """Get the translation for a string using Qt translation API.
+
+        We implement this ourselves since we do not inherit QObject.
+
+        :param message: String for translation.
+        :type message: str, QString
+
+        :returns: Translated version of message.
+        :rtype: QString
+        """
+        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+        return QCoreApplication.translate('MultiDistanceBuffer', message)
 
     def initGui(self):
         # Create action that will start plugin configuration
@@ -60,26 +86,24 @@ class MultiDistanceBuffer:
         # connect the action to the run method
         QObject.connect(self.action, SIGNAL("triggered()"), self.run)
 
-        # Add toolbar button and menu item
-        if hasattr(self.iface, 'addDatabaseToolBarIcon'):
+        # Add toolbar button
+        if hasattr(self.iface, 'addVectorToolBarIcon'):
             self.iface.addVectorToolBarIcon(self.action)
         else:
             self.iface.addToolBarIcon(self.action)
+        # Add menu item
         if hasattr(self.iface, 'addPluginToVectorMenu'):
-            self.iface.addPluginToVectorMenu(u"&Multiple Distance Buffer",
-                                                               self.action)
+            self.iface.addPluginToVectorMenu(self.menu, self.action)
         else:
-            self.iface.addPluginToMenu("&Multiple Distance Buffer",
-                                                        self.action)
+            self.iface.addPluginToMenu(self.menu, self.action)
 
     def unload(self):
-        # Remove the plugin menu item and icon
+        # Remove the plugin menu item
         if hasattr(self.iface, 'removePluginVectorMenu'):
-            self.iface.removePluginVectorMenu(u"&Multiple Distance Buffer",
-                                                               self.action)
+            self.iface.removePluginVectorMenu(self.menu, self.action)
         else:
-            self.iface.removePluginMenu(u"&Multiple Distance Buffer",
-                                                         self.action)
+            self.iface.removePluginMenu(self.menu, self.action)
+        # Remove the plugin toolbar icon
         if hasattr(self.iface, 'removeVectorToolBarIcon'):
             self.iface.removeVectorToolBarIcon(self.action)
         else:
@@ -94,10 +118,8 @@ class MultiDistanceBuffer:
                 layerslist.append((layers[id].name(), id))
         if len(layerslist) == 0 or len(layers) == 0:
             QMessageBox.information(None,
-               QCoreApplication.translate('MultiDistanceBuffer',
-                                                'Information'),
-               QCoreApplication.translate('MultiDistanceBuffer',
-                                      'Vector layers not found'))
+               self.tr('Information'),
+               self.tr('Vector layers not found'))
             return
         self.dlg.iface = self.iface
         self.dlg.progressBar.setValue(0.0)

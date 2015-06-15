@@ -18,8 +18,8 @@ Functionality
 
 The Multi-Distance Buffer plugin creates a multi-distance buffer
 vector dataset from an input vector layer and a set of distances.
-The result dataset consists bands (donut type) of regions according
-to the buffer distances provided.
+The result dataset consists of bands (donut type) of regions
+according to the buffer distances provided.
 If 100 and 200 are provided as distances, the result dataset will
 consist of two bands - one will contain all areas that are within
 100 units from the geometries of the input vector layer, the other

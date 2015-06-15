@@ -1,11 +1,11 @@
 #/***************************************************************************
-# GroupStats
+# multidistancebuffer
 # 
-# Oblicza statystyki danych
+# Create buffer zones at multiple distances
 #                             -------------------
-#        begin                : 2012-12-21
-#        copyright            : (C) 2012 by Rayo
-#        email                : rayo001@interia.pl
+#        begin                : 2015-04-10
+#        copyright            : (C) 2012 by Håvard Tveite
+#        email                : havard.tveite@nmbu.no
 # ***************************************************************************/
 # 
 #/***************************************************************************
@@ -24,7 +24,8 @@ LOCALES = "nn nb"
 # If locales are enabled, set the name of the lrelease binary on your system. If
 # you have trouble compiling the translations, you may have to specify the full path to
 # lrelease
-LRELEASE = lrelease
+#LRELEASE = lrelease
+LRELEASE = lrelease-qt4
 
 SOURCES = MultiDistanceBuffer.py \
           MultiDistanceBuffer_gui.py \
@@ -52,7 +53,7 @@ EXTRAS = icon.png metadata.txt
 
 COMPILED_RESOURCE_FILES = resources_rc.py
 
-PEP8EXCLUDE=pydev,resources_rc.py,conf.py,third_party,ui
+PEP8EXCLUDE=pydev,resources_rc.py,conf.py,third_party,ui,scripts,plugin_upload.py
 
 #################################################
 # Normally you would not need to edit below here
@@ -169,8 +170,8 @@ transup:
 	@echo "------------------------------------------------"
 	@echo "Updating translation files with any new strings."
 	@echo "------------------------------------------------"
-	#@chmod +x scripts/update-strings.sh
-	#pylupdate4 Makefile
+	### @chmod +x scripts/update-strings.sh
+	### pylupdate4 Makefile
 	@scripts/update-strings.sh $(LOCALES)
     
 # transcompile
