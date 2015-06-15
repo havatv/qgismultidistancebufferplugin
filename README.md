@@ -1,4 +1,3 @@
-# qgismultidistancebufferplugin
 MultiDistanceBuffer
 ===================
 QGIS Plugin for Multi-distance buffering
