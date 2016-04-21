@@ -111,13 +111,14 @@ class Worker(QtCore.QObject):
             # Do the buffering:
             outbuffers = []
             outbufferlayers = []
-            i = 0
+            j = 0
             for dist in self.buffersizes:
                 if self.abort is True:
                     break
                 self.status.emit('Buffering distance ' + str(dist) + '...')
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
-                # Do the buffer operation
+                # Do the buffer operation (can only produce a Shapefile
+                #   format dataset)
                 # parameters: layer, path to output data set,
                 # distance, selected only, dissolve, attribute index
                 ok = QgsGeometryAnalyzer().buffer(layercopy,
@@ -131,18 +132,37 @@ class Worker(QtCore.QObject):
                 outbuffers.append(outbuffername)
                 outbufferlayers.append(bufflayer)
                 bufflayer = None
+                # Calculate the ring (to be moved from below)
+                #if j > 0:
+                #
+                #
                 self.calculate_progress()
+                j = j + 1
             # Make a copy for the rings
             error = QgsVectorFileWriter.writeAsVectorFormat(outbufferlayers[0],
                     self.ringpath,
                     outbufferlayers[0].dataProvider().encoding(),
                     None, "ESRI Shapefile")
-            ringlayer = QgsVectorLayer(self.ringpath, 'rings', "ogr")
+            #ringlayer = QgsVectorLayer(self.ringpath, 'rings', "ogr")
+
+            # Create a memory layer for the result:
+            # Prepare the string describing the geometry
+            layeruri = 'Polygon?'
+            layeruri = (layeruri + 'crs=' +
+                        str(outbufferlayers[0].dataProvider().crs().authid()))
+            mem2result = QgsVectorLayer(layeruri, self.outputlayername,
+                                                              "memory")
+            for ringfield in outbufferlayers[0].dataProvider().fields().toList():
+                mem2result.dataProvider().addAttributes([ringfield])
+            mem2result.updateFields()
             self.status.emit('Merging')
             for j in reversed(range(len(outbufferlayers))):
                 if j == 0:
-                    continue  # We already have this one included
+                    for midfeature in outbufferlayers[j].getFeatures():
+                        mem2result.dataProvider().addFeatures([midfeature])
+                    #continue  # We already have the inner buffer included
                 for outerfeature in outbufferlayers[j].getFeatures():
+                    # Get the donut by subtracting the inner ring from this ring
                     outergeom = outerfeature.geometry()
                     for innerfeature in outbufferlayers[j - 1].getFeatures():
                         innergeom = innerfeature.geometry()
@@ -151,26 +171,28 @@ class Worker(QtCore.QObject):
                     newfeature = QgsFeature()
                     newfeature.setGeometry(outergeom)
                     newfeature.setAttributes(outerfeature.attributes())
-                    ringlayer.dataProvider().addFeatures([newfeature])
+                    #ringlayer.dataProvider().addFeatures([newfeature])
+                    mem2result.dataProvider().addFeatures([newfeature])
             # Create a memory layer for the result:
             # Prepare the string describing the geometry
-            layeruri = 'Polygon?'
-            layeruri = (layeruri + 'crs=' +
-                        str(ringlayer.dataProvider().crs().authid()))
-            memresult = QgsVectorLayer(layeruri, self.outputlayername,
-                                                              "memory")
-            for ringfield in ringlayer.dataProvider().fields().toList():
-                memresult.dataProvider().addAttributes([ringfield])
-            memresult.updateFields()
-            for feature in ringlayer.getFeatures():
-                fet = QgsFeature()
-                fet.setGeometry(feature.geometry())
-                fet.setAttributes(feature.attributes())
-                memresult.dataProvider().addFeatures([fet])
-            memresult.updateExtents()
+            #layeruri = 'Polygon?'
+            #layeruri = (layeruri + 'crs=' +
+            #            str(ringlayer.dataProvider().crs().authid()))
+            #memresult = QgsVectorLayer(layeruri, self.outputlayername,
+            #                                                  "memory")
+            #for ringfield in ringlayer.dataProvider().fields().toList():
+            #    memresult.dataProvider().addAttributes([ringfield])
+            #memresult.updateFields()
+            #for feature in ringlayer.getFeatures():
+            #    fet = QgsFeature()
+            #    fet.setGeometry(feature.geometry())
+            #    fet.setAttributes(feature.attributes())
+            #    memresult.dataProvider().addFeatures([fet])
+            #memresult.updateExtents()
+            mem2result.updateExtents()
             # Remove references
             outbufflayers = None
-            ringlayer = None
+            #ringlayer = None
             layercopy = None
         except:
             # Remove references
@@ -184,10 +206,13 @@ class Worker(QtCore.QObject):
             if self.abort:
                 self.finished.emit(False, None)
             else:
-                if memresult is not None:
+                #if memresult is not None:
+                if mem2result is not None:
                     self.status.emit('Delivering the layer...')
-                    self.finished.emit(True, memresult)
-                    memresult = None
+                    self.finished.emit(True, mem2result)
+                    mem2result = None
+                    #self.finished.emit(True, memresult)
+                    #memresult = None
                 else:
                     self.finished.emit(False, None)
     # end of run
