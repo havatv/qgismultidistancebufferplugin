@@ -42,6 +42,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         okButton.setText(self.OK)
         cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
         cancelButton.setText(self.CANCEL)
+        cancelButton.setEnabled(False)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
         # Connect the user interface signals
