@@ -26,8 +26,8 @@ from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
 from qgis.core import QgsRectangle, QgsCoordinateTransform
 from qgis.core import QgsMapLayer, QgsExpression, QgsVectorFileWriter
 from qgis.analysis import QgsGeometryAnalyzer, QgsOverlayAnalyzer
-from processing.core.Processing import Processing
-import processing
+#from processing.core.Processing import Processing
+#import processing
 #from processing import *
 from PyQt4 import QtCore
 from PyQt4.QtCore import QCoreApplication, QVariant
