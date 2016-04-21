@@ -91,6 +91,7 @@ class Worker(QtCore.QObject):
         # Directories and files
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         self.ringpath = self.tempfilepath + 'rings.shp'
+    # end of __init__
 
     def run(self):
         try:
@@ -158,7 +159,6 @@ class Worker(QtCore.QObject):
                         str(ringlayer.dataProvider().crs().authid()))
             memresult = QgsVectorLayer(layeruri, self.outputlayername,
                                                               "memory")
-            #memresult.startEditing()
             for ringfield in ringlayer.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([ringfield])
             memresult.updateFields()
@@ -167,7 +167,7 @@ class Worker(QtCore.QObject):
                 fet.setGeometry(feature.geometry())
                 fet.setAttributes(feature.attributes())
                 memresult.dataProvider().addFeatures([fet])
-            #memresult.commitChanges()
+            memresult.updateExtents()
             # Remove references
             outbufflayers = None
             ringlayer = None
@@ -190,6 +190,7 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
+    # end of run
 
     def calculate_progress(self):
         '''Update progress and emit a signal with the percentage'''
@@ -201,10 +202,12 @@ class Worker(QtCore.QObject):
             if perc_new > self.percentage:
                 self.percentage = perc_new
                 self.progress.emit(self.percentage)
+    # end of calculate_progress
 
     def kill(self):
         '''Kill the thread by setting the abort flag'''
         self.abort = True
+    # end of kill
 
     def tr(self, message):
         '''Get the translation for a string using Qt translation API.

@@ -2,21 +2,15 @@
 
 import os
 import glob
-import sys
 import tempfile
 import uuid
-from os.path import dirname
-from os.path import join
-from qgis.core import *
-from qgis.gui import *
+from os.path import dirname, join
+from qgis.core import QgsMapLayerRegistry, QgsMessageLog
+from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from PyQt4 import uic
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import pickle
-from math import *
-import os
-import csv
-import webbrowser
+from PyQt4.QtCore import QCoreApplication, QObject, SIGNAL, QThread
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
+from PyQt4.QtGui import QStandardItemModel
 
 from MultiDistanceBuffer_engine import Worker
 
@@ -25,7 +19,6 @@ FORM_CLASS, _ = uic.loadUiType(join(
 
 
 class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
-#class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent=None):
         self.iface = iface
         self.plugin_dir = dirname(__file__)
@@ -61,11 +54,12 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.listModel = QStandardItemModel(self.bufferList)
         self.bufferList.setModel(self.listModel)
         self.bufferList.sizeHintForColumn(20)
+        self.workerlayername = 'mdblayer'
         self.tmpdir = tempfile.gettempdir()
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
-        #self.resultpath = self.tmpdir + '/MDBresult.shp'
+    # end of __init__
 
     def startWorker(self):
         if self.bufferSB.hasFocus():
@@ -73,9 +67,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Return if there are no buffer distances specified
         if self.listModel.rowCount() == 0:
             return
-        # Return if no meaningful buffer distances are specified
-        #if self.listModel.rowCount() == 1 and float(self.listModel.item(0).text()) == 0.0:
-        #    return
         selectedonly = self.selectedOnlyCB.isChecked()
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
@@ -86,18 +77,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 None, "ESRI Shapefile", selectedonly)
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
-        self.showInfo('uuid: ' + str(uuid.uuid4()))
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
-        outputlayername = self.outputLayerName.text()
         tempfilepathprefix = self.tempfilepathprefix
-        QgsMessageLog.logMessage('Starting worker: ' +
-                                 str(bufferdistances),
-                                 self.MULTIDISTANCEBUFFER,
-                                 QgsMessageLog.INFO)
+        self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
-                      outputlayername, selectedonly, tempfilepathprefix)
+                      self.workerlayername, selectedonly, tempfilepathprefix)
         thread = QThread(self)
         worker.moveToThread(thread)
         worker.finished.connect(self.workerFinished)
@@ -116,7 +102,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def workerFinished(self, ok, ret):
         """Handles the output from the worker and cleans up after the
-           worker has finished."""
+           worker has finished.
+           Makes a copy of the returned layer to fix selection issues"""
         # clean up the worker and thread
         self.worker.deleteLater()
         self.thread.quit()
@@ -129,23 +116,31 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             for tmpfile in tmpfiles:
                 os.remove(tmpfile)
         except:
-            QgsMessageLog.logMessage(
-                           'Info: Unable to delete temporary files...',
-                           self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
-
+            self.showInfo(self.tr('Unable to delete temporary files...'))
         if ok and ret is not None:
+            # get the name of the outputlayer
+            outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            QgsMessageLog.logMessage(self.tr('MultiDistanceBuffer finished'),
-                                     self.MULTIDISTANCEBUFFER,
-                                     QgsMessageLog.INFO)
-            result_layer.dataProvider().updateExtents()
-            result_layer.commitChanges()
+            #QgsMapLayerRegistry.instance().addMapLayer(result_layer)
+            self.showInfo(self.tr('MultiDistanceBuffer finished'))
             self.layerlistchanging = True
-            result_layer.removeSelection()
-            QgsMapLayerRegistry.instance().addMapLayer(result_layer)
-            result_layer = None
             self.layerlistchanging = False
+            resultlayercopy = QgsVectorLayer(
+                        "Polygon?crs=%s" % result_layer.crs().authid(),
+                        outputlayername, "memory")
+            resfields = result_layer.dataProvider().fields()
+            for field in resfields:
+                resultlayercopy.dataProvider().addAttributes([field])
+            resultlayercopy.updateFields()
+            QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
+            for feature in result_layer.getFeatures():
+                resultlayercopy.dataProvider().addFeatures([feature])
+            resultlayercopy.updateExtents()
+            resultlayercopy.reload()
+            self.iface.mapCanvas().refresh()
+            result_layer = None
+            resultlayercopy = None
         else:
             # notify the user that something went wrong
             if not ok:
@@ -156,43 +151,44 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
+        #self.close()
     # end of workerFinished
 
     def workerError(self, exception_string):
         """Report an error from the worker."""
-        #QgsMessageLog.logMessage(self.tr('Worker failed - exception') +
-        #                                  ': ' + str(exception_string),
-        #                                      self.MULTIDISTANCEBUFFER,
-        #                                        QgsMessageLog.CRITICAL)
-        self.showError(exception_string)
+        self.showError(self.tr('Worker failed - exception: ') +
+                       exception_string)
+    # end of workerError
 
     def workerInfo(self, message_string):
         """Report an info message from the worker."""
-        QgsMessageLog.logMessage(self.tr('Worker') + ': ' + message_string,
-                                 self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
+        self.showInfo(self.tr('Worker: ') + message_string)
+    # end of workerInfo
 
     def killWorker(self):
         """Kill the worker thread."""
         if self.worker is not None:
-            QgsMessageLog.logMessage(self.tr('Killing worker'),
-                                     self.MULTIDISTANCEBUFFER,
-                                     QgsMessageLog.INFO)
+            self.showInfo('Killing worker')
             self.worker.kill()
+    # end of killWorker
 
     def showError(self, text):
         """Show an error."""
         QgsMessageLog.logMessage('Error: ' + text, self.MULTIDISTANCEBUFFER,
                                  QgsMessageLog.CRITICAL)
+    # end of showError
 
     def showWarning(self, text):
         """Show a warning."""
         QgsMessageLog.logMessage('Warning: ' + text, self.MULTIDISTANCEBUFFER,
                                  QgsMessageLog.WARNING)
+    # end of showWarning
 
     def showInfo(self, text):
         """Show info."""
         QgsMessageLog.logMessage('Info: ' + text, self.MULTIDISTANCEBUFFER,
                                  QgsMessageLog.INFO)
+    # end of showInfo
 
     def reject(self):
         """Reject override."""
@@ -204,23 +200,18 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             for tmpfile in tmpfiles:
                 os.remove(tmpfile)
         except:
-            QgsMessageLog.logMessage(
-                                'Info: Unable to delete temporary files...',
-                                self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
+            self.showInfo('Unable to delete temporary files...')
         QDialog.reject(self)
+    # end of reject
 
     def addDistance(self):
         # 0.0 can not be accepted as a buffer distance
         if float(self.bufferSB.value()) == 0.0:
-            self.showInfo('Buffer with radius 0 is not accepted')
+            self.showInfo('Buffer radius 0 is not accepted')
             return
         for i in range(self.listModel.rowCount()):
             # Check if the value is already in the list
             if self.listModel.item(i).text() == str(self.bufferSB.value()):
-                #QgsMessageLog.logMessage('Add Distance: Duplicate ' +
-                #                      self.listModel.item(i).text(),
-                #                      self.MULTIDISTANCEBUFFER,
-                #                      QgsMessageLog.INFO)
                 return
             else:
                 # Maintain a sorted list of distances
@@ -232,16 +223,12 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         item = QStandardItem(str(self.bufferSB.value()))
         self.listModel.appendRow(item)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-        if self.listModel.rowCount() == 1 and float(self.listModel.item(0).text()) == 0.0:
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-    # end of adddistance
+    # end of addDistance
 
     def addDistanceEnter(self):
         # Check that the spinbox has not lost focus - then we can
         # "accept" the editingFinished signal
         if not self.bufferSB.hasFocus():
-            #QgsMessageLog.logMessage('Add Distance Enter: No Focus',
-            #               self.MULTIDISTANCEBUFFER, QgsMessageLog.INFO)
             return
         self.addDistance()
     # end of addDistanceEnter
