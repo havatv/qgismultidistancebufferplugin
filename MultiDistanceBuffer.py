@@ -115,7 +115,8 @@ class MultiDistanceBuffer:
         layerslist = []
         for id in layers.keys():
             if layers[id].type() == 0:  # 0: Vector Layer
-                layerslist.append((layers[id].name(), id))
+                if layers[id].wkbType() != QGis.WKBNoGeometry:
+                    layerslist.append((layers[id].name(), id))
         if len(layerslist) == 0 or len(layers) == 0:
             QMessageBox.information(None,
                self.tr('Information'),
