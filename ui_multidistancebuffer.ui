@@ -64,7 +64,7 @@
         <item>
          <widget class="QDoubleSpinBox" name="bufferSB">
           <property name="decimals">
-           <number>1</number>
+           <number>9</number>
           </property>
           <property name="maximum">
            <double>999999999.000000000000000</double>
@@ -114,7 +114,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>100</width>
             <height>16777215</height>
            </size>
           </property>
@@ -172,11 +172,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QProgressBar" name="progressBar">
-       <property name="value">
-        <number>24</number>
-       </property>
-      </widget>
+      <widget class="QProgressBar" name="progressBar"/>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">
