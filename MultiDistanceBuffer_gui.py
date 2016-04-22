@@ -39,6 +39,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         cancelButton.setEnabled(False)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
+        self.removeButton.setEnabled(False)
         # Connect the user interface signals
         QObject.connect(self.addButton, SIGNAL("clicked()"),
                                             self.addDistance)
@@ -54,6 +55,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.listModel = QStandardItemModel(self.bufferList)
         self.bufferList.setModel(self.listModel)
         self.bufferList.sizeHintForColumn(20)
+        blSelModel = self.bufferList.selectionModel()
+        blSelModel.selectionChanged.connect(self.distanceSelectionChanged)
         self.workerlayername = 'mdblayer'
         self.tmpdir = tempfile.gettempdir()
         # Temporary file prefix, for easy removal of temporary files:
@@ -233,6 +236,14 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.addDistance()
     # end of addDistanceEnter
 
+    def distanceSelectionChanged(self):
+        if (self.bufferList.selectedIndexes() == None or
+            len(self.bufferList.selectedIndexes()) == 0):
+            self.removeButton.setEnabled(False)
+        else:
+            self.removeButton.setEnabled(True)
+    # end of distanceSelectionChanged
+
     def removeDistance(self):
         self.bufferList.setUpdatesEnabled(False)
         indexes = self.bufferList.selectedIndexes()
@@ -242,6 +253,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferList.setUpdatesEnabled(True)
         if self.listModel.rowCount() == 0:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.removeButton.setEnabled(False)
     # end of removeDistance
 
     def tr(self, message):
