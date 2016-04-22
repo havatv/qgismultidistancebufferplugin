@@ -139,21 +139,22 @@ class Worker(QtCore.QObject):
                 bufferlayers.append(bufflayer)
                 bufflayer = None
                 # Calculate the current distance band
-                if j == 0: # The innermost buffer
+                if j == 0:     # The innermost buffer
                     for midfeature in bufferlayers[j].getFeatures():
                         memresult.dataProvider().addFeatures([midfeature])
                 else:
-                  for outerfeature in bufferlayers[j].getFeatures():
-                    # Get the donut by subtracting the inner ring from this ring
-                    outergeom = outerfeature.geometry()
-                    for innerfeature in bufferlayers[j - 1].getFeatures():
-                        innergeom = innerfeature.geometry()
-                        newgeom = outergeom.symDifference(innergeom)
-                        outergeom = newgeom
-                    newfeature = QgsFeature()
-                    newfeature.setGeometry(outergeom)
-                    newfeature.setAttributes(outerfeature.attributes())
-                    memresult.dataProvider().addFeatures([newfeature])
+                    for outerfeature in bufferlayers[j].getFeatures():
+                        # Get the donut by subtracting the inner ring
+                        # from this ring
+                        outergeom = outerfeature.geometry()
+                        for innerfeature in bufferlayers[j - 1].getFeatures():
+                            innergeom = innerfeature.geometry()
+                            newgeom = outergeom.symDifference(innergeom)
+                            outergeom = newgeom
+                        newfeature = QgsFeature()
+                        newfeature.setGeometry(outergeom)
+                        newfeature.setAttributes(outerfeature.attributes())
+                        memresult.dataProvider().addFeatures([newfeature])
                 self.calculate_progress()
                 j = j + 1
             # Update the layer extents (after adding features)
@@ -215,4 +216,3 @@ class Worker(QtCore.QObject):
         # noinspection PyTypeChecker, PyArgumentList, PyCallByClass
         return QCoreApplication.translate('NNJoinEngine', message)
     # end of tr
-

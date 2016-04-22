@@ -256,7 +256,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of addDistanceEnter
 
     def distanceSelectionChanged(self):
-        if (self.bufferList.selectedIndexes() == None or
+        if (self.bufferList.selectedIndexes() is None or
             len(self.bufferList.selectedIndexes()) == 0):
             self.removeButton.setEnabled(False)
         else:
