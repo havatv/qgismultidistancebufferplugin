@@ -26,6 +26,7 @@ import uuid
 from os.path import dirname, join
 from qgis.core import QgsMapLayerRegistry, QgsMessageLog
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+from qgis.core import QGis
 from PyQt4 import uic
 from PyQt4.QtCore import QCoreApplication, QObject, SIGNAL, QThread
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
@@ -70,6 +71,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         okButton.clicked.connect(self.startWorker)
         cancelButton.clicked.connect(self.killWorker)
         closeButton.clicked.connect(self.reject)
+        # Add handler for layer selection
+        self.inputLayer.currentIndexChanged.connect(self.layerSelectionChanged)
         # Initialise the model for the QListView
         self.listModel = QStandardItemModel(self.bufferList)
         self.bufferList.setModel(self.listModel)
@@ -93,12 +96,19 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
-        # Make a copy of the input layer (with selected features)
+        # Make a copy of the input layer (with only selected features)
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
                 None, "ESRI Shapefile", selectedonly)
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
+        # Check if the geometries of the layer are valid
+        valid = True
+        for feature in layercopy.getFeatures():
+            if not feature.isValid():
+                valid = False
+        if valid == False:
+            self.showWarning("The layer has invalid features!")
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
@@ -223,6 +233,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 os.remove(tmpfile)
         except:
             self.showInfo('Unable to delete temporary files...')
+        self.listModel.clear()
         QDialog.reject(self)
     # end of reject
 
@@ -262,6 +273,28 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         else:
             self.removeButton.setEnabled(True)
     # end of distanceSelectionChanged
+
+    def layerSelectionChanged(self):
+        layerindex = self.inputLayer.currentIndex()
+        layerId = self.inputLayer.itemData(layerindex)
+        # We know that all the layers in inputLayer are valid vector layers
+        thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        if thelayer is not None and thelayer.geometryType() == QGis.Polygon:
+            # Allow negative buffer distances for polygon layers
+            self.bufferSB.setMinimum(-999999999.0)
+        else:
+            # Allow only positive buffer distances for point and line layers
+            self.bufferSB.setMinimum(0.0)
+            i = 0
+            # Remove all negative buffer distance values
+            while i < self.listModel.rowCount():
+                if float(self.listModel.item(i).text()) < 0.0:
+                    self.listModel.removeRow(i)
+                else:
+                    i = i+1
+            if self.listModel.rowCount() == 0:
+                self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+    # end of layerSelectionChanged
 
     def removeDistance(self):
         self.bufferList.setUpdatesEnabled(False)

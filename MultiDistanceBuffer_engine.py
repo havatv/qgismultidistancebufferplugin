@@ -51,7 +51,7 @@ class Worker(QtCore.QObject):
                                 layer for the buffer.
         inputvectorlayerpath -- Path to the input vector data set
                                 for the buffer.
-        buffersizes --          array of floats.
+        buffersizes --          array of floats, sorted asc.
         outputlayername --      Name of the output vector layer.
         selectedonly --         (boolean) Should only selected
                                 features be buffered.
@@ -131,6 +131,15 @@ class Worker(QtCore.QObject):
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
                 bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
+                # Check if the buffer data set is empty
+                if bufflayer.featureCount() == 0:
+                    continue
+                if bufflayer.featureCount() == 1:
+                    thefeature = None
+                    for f in bufflayer.getFeatures():
+                        thefeature = f
+                    if (not thefeature) or (thefeature.geometry() is None):
+                        continue
                 # Set the buffer distance attribute to the current distance
                 for feature in bufflayer.getFeatures():
                     attrs = {0: dist}  # Set the value of the first attribute

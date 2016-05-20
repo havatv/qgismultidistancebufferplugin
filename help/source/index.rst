@@ -25,6 +25,7 @@ consist of two bands - one will contain all areas that are within
 100 units from the geometries of the input vector layer, the other
 will contain all areas that are from 100 to 200 units from the
 geometries of the input vector layer.
+Negative buffer distances are allowed for polygon layers.
 
 The user can choose to only buffer around selected features.
 
