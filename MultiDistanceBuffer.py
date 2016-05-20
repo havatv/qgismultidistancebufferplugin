@@ -35,9 +35,7 @@ class MultiDistanceBuffer:
     def __init__(self, iface):
         # Save reference to the QGIS interface
         self.iface = iface
-
         pluginPath = QFileInfo(os.path.realpath(__file__)).path()
-
         # initialize locale using the QGIS locale
         locale = QSettings().value('locale/userLocale')[0:2]
         if QFileInfo(pluginPath).exists():
@@ -45,14 +43,11 @@ class MultiDistanceBuffer:
                pluginPath,
                'i18n',
                '{}.qm'.format(locale))
-
         # initialize locale
         #localeName = QLocale.system().name()
-
         #if QFileInfo(pluginPath).exists():
         #    self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
         #                       + localeName + ".qm")
-
         if QFileInfo(self.localePath).exists():
             self.translator = QTranslator()
             self.translator.load(self.localePath)
@@ -60,7 +55,6 @@ class MultiDistanceBuffer:
                 QCoreApplication.installTranslator(self.translator)
         # Create the dialog and keep reference
         self.dlg = MultiDistanceBufferDialog(self.iface)
-
         self.menu = self.tr(u'&Multiple Distance Buffer')
 
     # noinspection PyMethodMayBeStatic
@@ -85,7 +79,6 @@ class MultiDistanceBuffer:
             u"MultiDistanceBuffer", self.iface.mainWindow())
         # connect the action to the run method
         QObject.connect(self.action, SIGNAL("triggered()"), self.run)
-
         # Add toolbar button
         if hasattr(self.iface, 'addVectorToolBarIcon'):
             self.iface.addVectorToolBarIcon(self.action)
