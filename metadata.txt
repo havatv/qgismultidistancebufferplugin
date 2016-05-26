@@ -38,7 +38,7 @@ tags=buffer,multiple,multi,distance,vector,ring,zone
 category=Vector
 
 #homepage=https://plugins.qgis.org/plugins/MultiDistanceBuffer/
-homepage=http://arken.umb.no/~havatv/gis/qgisplugins/MultiDistanceBuffer/
+homepage=http://arken.nmbu.no/~havatv/gis/qgisplugins/MultiDistanceBuffer/
 tracker=https://github.com/havatv/qgismultidistancebufferplugin/issues
 repository=https://github.com/havatv/qgismultidistancebufferplugin.git
 icon=icon.png
