@@ -24,5 +24,5 @@
 
 def classFactory(iface):
     # load MultiDistanceBuffer class from file MultiDistanceBuffer
-    from MultiDistanceBuffer import MultiDistanceBuffer
+    from .MultiDistanceBuffer import MultiDistanceBuffer
     return MultiDistanceBuffer(iface)

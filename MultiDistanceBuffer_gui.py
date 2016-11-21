@@ -107,7 +107,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         for feature in layercopy.getFeatures():
             if not feature.isValid():
                 valid = False
-        if valid == False:
+        if valid is False:
             self.showWarning("The layer has invalid features!")
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
@@ -291,7 +291,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 if float(self.listModel.item(i).text()) < 0.0:
                     self.listModel.removeRow(i)
                 else:
-                    i = i+1
+                    i = i + 1
             # Disable the OK button if no buffer distances are specified
             if self.listModel.rowCount() == 0:
                 self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
