@@ -25,6 +25,8 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 # Initialize Qt resources from file resources.py
+import sys
+sys.path.append(os.path.dirname(__file__))
 import resources_rc
 # Import the code for the dialog
 from MultiDistanceBuffer_gui import MultiDistanceBufferDialog
@@ -78,7 +80,7 @@ class MultiDistanceBuffer:
             QIcon(":/plugins/MultiDistanceBuffer/icon.png"),
             u"MultiDistanceBuffer", self.iface.mainWindow())
         # connect the action to the run method
-        QObject.connect(self.action, SIGNAL("triggered()"), self.run)
+        self.action.triggered.connect(self.run)
         # Add toolbar button
         if hasattr(self.iface, 'addVectorToolBarIcon'):
             self.iface.addVectorToolBarIcon(self.action)

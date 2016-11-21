@@ -28,7 +28,7 @@ from qgis.core import QgsMapLayerRegistry, QgsMessageLog
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.core import QGis
 from PyQt4 import uic
-from PyQt4.QtCore import QCoreApplication, QObject, SIGNAL, QThread
+from PyQt4.QtCore import QCoreApplication, QObject, QThread
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
 from PyQt4.QtGui import QStandardItemModel
 
@@ -61,12 +61,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         closeButton.setText(self.CLOSE)
         self.removeButton.setEnabled(False)
         # Connect the user interface signals
-        QObject.connect(self.addButton, SIGNAL("clicked()"),
-                                            self.addDistance)
-        QObject.connect(self.removeButton, SIGNAL("clicked()"),
-                                            self.removeDistance)
-        QObject.connect(self.bufferSB, SIGNAL("editingFinished()"),
-                                              self.addDistanceEnter)
+        self.addButton.clicked.connect(self.addDistance)
+        self.removeButton.clicked.connect(self.removeDistance)
+        self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
         cancelButton.clicked.connect(self.killWorker)
@@ -96,6 +93,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        if selectedonly and inputlayer.selectedFeatureCount() == 0:
+            self.showWarning("The layer has no selected features!")
+            return
         # Make a copy of the input layer (with only selected features)
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
@@ -292,8 +292,15 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                     self.listModel.removeRow(i)
                 else:
                     i = i+1
+            # Disable the OK button if no buffer distances are specified
             if self.listModel.rowCount() == 0:
                 self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        # Check if there is a selection and update the "use only
+        # selected features" checkbox accordingly
+        if thelayer is not None and thelayer.selectedFeatureCount() == 0:
+            self.selectedOnlyCB.setChecked(False)
+        else:
+            self.selectedOnlyCB.setChecked(True)
     # end of layerSelectionChanged
 
     def removeDistance(self):
