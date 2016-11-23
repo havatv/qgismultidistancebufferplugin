@@ -109,7 +109,6 @@ class MultiDistanceBuffer:
         layers = QgsMapLayerRegistry.instance().mapLayers()
         layerslist = []
         for id in layers.keys():
-            #if layers[id].type() == 0:  # 0: Vector Layer
             if layers[id].type() == QgsMapLayer.VectorLayer:
                 if layers[id].wkbType() != QGis.WKBNoGeometry:
                     layerslist.append((layers[id].name(), id))
