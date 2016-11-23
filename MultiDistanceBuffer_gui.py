@@ -99,7 +99,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Make a copy of the input layer (with only selected features)
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                inputlayer.dataProvider().crs(), "ESRI Shapefile", selectedonly)
+                inputlayer.dataProvider().crs(), "ESRI Shapefile",
+                selectedonly)
                 # None, "ESRI Shapefile", selectedonly)
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
