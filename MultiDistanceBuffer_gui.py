@@ -99,7 +99,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Make a copy of the input layer (with only selected features)
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                None, "ESRI Shapefile", selectedonly)
+                inputlayer.dataProvider().crs(), "ESRI Shapefile", selectedonly)
+                # None, "ESRI Shapefile", selectedonly)
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
         # Check if the geometries of the layer are valid
@@ -279,7 +280,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerId = self.inputLayer.itemData(layerindex)
         # We know that all the layers in inputLayer are valid vector layers
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
-        if thelayer is not None and thelayer.geometryType() == QGis.Polygon:
+        if thelayer is None:
+            return
+        if thelayer.geometryType() == QGis.Polygon:
             # Allow negative buffer distances for polygon layers
             self.bufferSB.setMinimum(-999999999.0)
         else:
@@ -297,7 +300,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         # Check if there is a selection and update the "use only
         # selected features" checkbox accordingly
-        if thelayer is not None and thelayer.selectedFeatureCount() == 0:
+        if thelayer.selectedFeatureCount() == 0:
             self.selectedOnlyCB.setChecked(False)
         else:
             self.selectedOnlyCB.setChecked(True)
