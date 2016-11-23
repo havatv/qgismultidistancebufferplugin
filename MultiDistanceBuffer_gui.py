@@ -245,8 +245,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
         if thelayer is None:
             return
-        # 0.0 can only be accepted for polygons
-        if float(self.bufferSB.value()) == 0.0 and not thelayer.geometryType() == QGis.Polygon:
+        # 0.0 is only meaningful for polygons
+        if (float(self.bufferSB.value()) == 0.0
+            and not thelayer.geometryType() == QGis.Polygon):
             self.showInfo('Buffer radius 0 is not accepted')
             return
         for i in range(self.listModel.rowCount()):
