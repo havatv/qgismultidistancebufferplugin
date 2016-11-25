@@ -81,6 +81,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
+        self.layercrs = None  # Stores the CRS of the layer
     # end of __init__
 
     def startWorker(self):
@@ -99,11 +100,11 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Make a copy of the input layer (with only selected features)
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                inputlayer.dataProvider().crs(), "ESRI Shapefile",
+                inputlayer.crs(), "ESRI Shapefile",
                 selectedonly)
-                # None, "ESRI Shapefile", selectedonly)
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
+        self.layercrs = layercopy.crs()
         # Check if the geometries of the layer are valid
         valid = True
         for feature in layercopy.getFeatures():
@@ -160,13 +161,24 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             self.layerlistchanging = True
             self.layerlistchanging = False
-            resultlayercopy = QgsVectorLayer(
-                        "Polygon?crs=%s" % result_layer.crs().authid(),
-                        outputlayername, "memory")
+            # Create a (memory) copy of the result layer
+            layeruri = 'Polygon?'
+            # Coordinate reference system needs to be specified
+            crstext = str(result_layer.crs().authid())
+            # If EPSG is not available, try the proj4 string
+            if not str(result_layer.crs().authid())[:5] == 'EPSG:':
+                crstext = "PROJ4:%s" % result_layer.crs().toProj4()
+            layeruri = (layeruri + 'crs=' + crstext)
+            resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
+                                                              "memory")
             resfields = result_layer.dataProvider().fields()
             for field in resfields:
                 resultlayercopy.dataProvider().addAttributes([field])
             resultlayercopy.updateFields()
+            # If EPSG is not available set the CRS to the original one,
+            # just in case
+            if str(result_layer.crs().authid())[:5] != 'EPSG:':
+                resultlayercopy.setCrs(self.layercrs)
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])

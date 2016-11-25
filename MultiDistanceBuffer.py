@@ -110,6 +110,10 @@ class MultiDistanceBuffer:
         layerslist = []
         for id in layers.keys():
             if layers[id].type() == QgsMapLayer.VectorLayer:
+                if not layers[id].isValid():
+                    QMessageBox.information(None,
+                        self.tr('Information'),
+                        'Layer ' + layers[id].name() + ' is not valid')
                 if layers[id].wkbType() != QGis.WKBNoGeometry:
                     layerslist.append((layers[id].name(), id))
         if len(layerslist) == 0 or len(layers) == 0:

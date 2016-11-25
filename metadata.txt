@@ -1,13 +1,15 @@
 [general]
 name=Multi-distance buffer
-version=1.2
+version=1.2.1
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.20
 description=Create multiple distance buffers
 author=Håvard Tveite, NMBU
 email=havard.tveite@nmbu.no
 about=The Multi-Distance Buffer plugin creates a multi-distance buffer vector dataset from an input vector layer and a set of distances. The result dataset consists of bands (donut type) of regions according to the buffer distances provided. If 100 and 200 are provided as distances, the result dataset will consist of two bands - one will contain all areas that are within 100 units from the geometries of the input vector layer, the other will contain all areas that are from 100 to 200 units from the geometries of the input vector layer.  The user can choose to only buffer around selected features.  Negative buffer distances are allowed for polygon layers.
-changelog=1.2 (2016-11)
+changelog=1.2.1 (2016-11)
+    - allow 0.0 buffer size for polygons
+    1.2 (2016-11)
     - update to "new style" signals and connections
     - selected features enhancements
     1.1

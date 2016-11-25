@@ -63,7 +63,7 @@ class Worker(QtCore.QObject):
         QtCore.QObject.__init__(self)  # Essential!
         # Creating instance variables from the parameters
         self.inpvl = inputvectorlayer
-        self.inputpath = inputvectorlayerpath
+        #self.inputpath = inputvectorlayerpath
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
         self.selectedonly = selectedonly
@@ -106,8 +106,12 @@ class Worker(QtCore.QObject):
             layercopy.updateFields()  # Commit the attribute changes
             # Create the memory layer for the results
             layeruri = 'Polygon?'
-            layeruri = (layeruri + 'crs=' +
-                        str(layercopy.dataProvider().crs().authid()))
+            # Coordinate reference system needs to be specified
+            crstext = str(layercopy.crs().authid())
+            # If EPSG is not available, use the proj4 string
+            if str(layercopy.crs().authid())[:5] != 'EPSG:':
+                crstext = "PROJ4:%s" % layercopy.crs().toProj4()
+            layeruri = (layeruri + 'crs=' + crstext)
             memresult = QgsVectorLayer(layeruri, self.outputlayername,
                                                               "memory")
             # Add attributes to the memory layer
@@ -128,6 +132,8 @@ class Worker(QtCore.QObject):
                 # distance, selected only, dissolve, attribute index
                 ok = QgsGeometryAnalyzer().buffer(layercopy,
                                 outbuffername, dist, False, True, -1)
+                if not ok:
+                    self.status.emit('Buffer operation failed!')
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
                 bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
