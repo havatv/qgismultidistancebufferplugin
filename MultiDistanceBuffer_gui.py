@@ -81,7 +81,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
-        self.layercrs = None  # Stores the CRS of the layer
+        self.layercrs = None  # The CRS of the layer
     # end of __init__
 
     def startWorker(self):
@@ -90,21 +90,29 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Return if there are no buffer distances specified
         if self.listModel.rowCount() == 0:
             return
-        selectedonly = self.selectedOnlyCB.isChecked()
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        # Get the layer CRS
+        self.layercrs = inputlayer.crs()
+        # Should only selected features be considered
+        selectedonly = self.selectedOnlyCB.isChecked()
         if selectedonly and inputlayer.selectedFeatureCount() == 0:
             self.showWarning("The layer has no selected features!")
             return
-        # Make a copy of the input layer (with only selected features)
+        # Make a copy of the input data set
+        # (considering selected features or not)
+        # "None": no crs reprojection
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                inputlayer.crs(), "ESRI Shapefile",
+                None, "ESRI Shapefile",
                 selectedonly)
+        if error:
+            self.showWarning("Copying the input layer failed! ("
+                             + str(error) + ")")
+            return
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
-        self.layercrs = layercopy.crs()
         # Check if the geometries of the layer are valid
         valid = True
         for feature in layercopy.getFeatures():
@@ -115,10 +123,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
-        tempfilepathprefix = self.tempfilepathprefix
         self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
-                      self.workerlayername, selectedonly, tempfilepathprefix)
+                      self.workerlayername, selectedonly,
+                      self.tempfilepathprefix)
         thread = QThread(self)
         worker.moveToThread(thread)
         worker.finished.connect(self.workerFinished)
@@ -164,10 +172,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
             # Coordinate reference system needs to be specified
-            crstext = str(result_layer.crs().authid())
-            # If EPSG is not available, try the proj4 string
-            if not str(result_layer.crs().authid())[:5] == 'EPSG:':
-                crstext = "PROJ4:%s" % result_layer.crs().toProj4()
+            # Use PROJ4 as it should be available for all layers
+            crstext = "PROJ4:%s" % self.layercrs.toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
@@ -175,9 +181,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             for field in resfields:
                 resultlayercopy.dataProvider().addAttributes([field])
             resultlayercopy.updateFields()
-            # If EPSG is not available set the CRS to the original one,
+            # If EPSG is not available, set the CRS to the original one,
             # just in case
-            if str(result_layer.crs().authid())[:5] != 'EPSG:':
+            if str(resultlayercopy.crs().authid())[:5] != 'EPSG:':
                 resultlayercopy.setCrs(self.layercrs)
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
             for feature in result_layer.getFeatures():

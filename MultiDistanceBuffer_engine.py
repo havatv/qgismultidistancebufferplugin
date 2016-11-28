@@ -32,6 +32,8 @@ from PyQt4.QtCore import QCoreApplication, QVariant
 class Worker(QtCore.QObject):
     '''The worker that does the heavy lifting.
     /* Leaves temporary files that should be deleted by the caller.
+     * Removes all attributes of the input layer and adds a distance
+     * attribute.
      *
     */
     '''
@@ -107,10 +109,7 @@ class Worker(QtCore.QObject):
             # Create the memory layer for the results
             layeruri = 'Polygon?'
             # Coordinate reference system needs to be specified
-            crstext = str(layercopy.crs().authid())
-            # If EPSG is not available, use the proj4 string
-            if str(layercopy.crs().authid())[:5] != 'EPSG:':
-                crstext = "PROJ4:%s" % layercopy.crs().toProj4()
+            crstext = "PROJ4:%s" % layercopy.crs().toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
             memresult = QgsVectorLayer(layeruri, self.outputlayername,
                                                               "memory")
@@ -118,7 +117,7 @@ class Worker(QtCore.QObject):
             for distfield in layercopy.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([distfield])
             memresult.updateFields()
-            # Do the buffering:
+            # Do the buffering (order: smallest to largest distances):
             j = 0
             for dist in self.buffersizes:
                 if self.abort is True:
@@ -133,7 +132,7 @@ class Worker(QtCore.QObject):
                 ok = QgsGeometryAnalyzer().buffer(layercopy,
                                 outbuffername, dist, False, True, -1)
                 if not ok:
-                    self.status.emit('Buffer operation failed!')
+                    self.status.emit('The buffer operation failed!')
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
                 bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
