@@ -21,9 +21,10 @@
 """
 import os.path
 # Import the PyQt and QGIS libraries
-from qgis.core import QgsMapLayerRegistry, QgsMapLayer, QGis
-from PyQt4.QtCore import QFileInfo, QSettings, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon, QMessageBox
+from qgis.core import QgsMapLayerRegistry, QgsMapLayer, QgsWkbTypes
+from PyQt5.QtCore import QFileInfo, QSettings, QCoreApplication
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QMessageBox
 # Initialize Qt resources from file resources.py
 import sys
 sys.path.append(os.path.dirname(__file__))
@@ -114,7 +115,7 @@ class MultiDistanceBuffer:
                     QMessageBox.information(None,
                         self.tr('Information'),
                         'Layer ' + layers[id].name() + ' is not valid')
-                if layers[id].wkbType() != QGis.WKBNoGeometry:
+                if layers[id].wkbType() != QgsWkbTypes.NoGeometry:
                     layerslist.append((layers[id].name(), id))
         if len(layerslist) == 0 or len(layers) == 0:
             QMessageBox.information(None,

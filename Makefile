@@ -25,7 +25,7 @@ LOCALES = "nn nb"
 # you have trouble compiling the translations, you may have to specify the full path to
 # lrelease
 #LRELEASE = lrelease
-LRELEASE = lrelease-qt4
+LRELEASE = lrelease
 
 SOURCES = MultiDistanceBuffer.py \
           MultiDistanceBuffer_gui.py \
@@ -65,14 +65,14 @@ PLUGIN_UPLOAD = $(c)/plugin_upload.py
 
 RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
 
-QGISDIR=.qgis2
+QGISDIR=.qgis3
 
 default: compile
 
 compile: $(COMPILED_RESOURCE_FILES)
 
 %_rc.py : %.qrc $(RESOURCES_SRC)
-	pyrcc4 -o $*_rc.py  $<
+	pyrcc5 -o $*_rc.py  $<
 
 %.qm : %.ts
 	$(LRELEASE) $<
@@ -171,9 +171,9 @@ transup:
 	@echo "Updating translation files with any new strings."
 	@echo "------------------------------------------------"
 	### @chmod +x scripts/update-strings.sh
-	### pylupdate4 Makefile
+	### pylupdate5 Makefile
 	@scripts/update-strings.sh $(LOCALES)
-    
+
 # transcompile
 # compile translation files into .qm binary format
 transcompile: $(TRANSLATIONS:.ts=.qm)

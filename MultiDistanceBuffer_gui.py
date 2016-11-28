@@ -25,12 +25,12 @@ import tempfile
 import uuid
 from os.path import dirname, join
 from qgis.core import QgsMapLayerRegistry, QgsMessageLog
+from qgis.core import QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
-from qgis.core import QGis
-from PyQt4 import uic
-from PyQt4.QtCore import QCoreApplication, QObject, QThread
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
-from PyQt4.QtGui import QStandardItemModel
+from PyQt5 import uic
+from PyQt5.QtCore import QCoreApplication, QObject, QThread
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
 from MultiDistanceBuffer_engine import Worker
 
@@ -105,7 +105,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # "None": no crs reprojection
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                None, "ESRI Shapefile",
+                self.layercrs, "ESRI Shapefile",
                 selectedonly)
         if error:
             self.showWarning("Copying the input layer failed! ("
@@ -265,7 +265,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         # 0.0 is only meaningful for polygons
         if (float(self.bufferSB.value()) == 0.0
-            and not thelayer.geometryType() == QGis.Polygon):
+            and not thelayer.geometryType() == QgsWkbTypes.PolygonGeometry):
             self.showInfo('Buffer radius 0 is not accepted')
             return
         for i in range(self.listModel.rowCount()):
@@ -307,7 +307,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
         if thelayer is None:
             return
-        if thelayer.geometryType() == QGis.Polygon:
+        if thelayer.geometryType() == QgsWkbTypes.PolygonGeometry:
             # Allow negative buffer distances for polygon layers
             self.bufferSB.setMinimum(-999999999.0)
         else:

@@ -19,14 +19,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
+from qgis.core import QgsMessageLog, QgsMapLayerRegistry
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
 from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
 from qgis.core import QgsRectangle, QgsCoordinateTransform
 from qgis.core import QgsMapLayer, QgsExpression, QgsVectorFileWriter
 from qgis.analysis import QgsGeometryAnalyzer, QgsOverlayAnalyzer
-from PyQt4 import QtCore
-from PyQt4.QtCore import QCoreApplication, QVariant
+from PyQt5 import QtCore
+from PyQt5.QtCore import QCoreApplication, QVariant
 
 
 class Worker(QtCore.QObject):
