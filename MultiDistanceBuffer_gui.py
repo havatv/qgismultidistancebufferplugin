@@ -27,10 +27,10 @@ from os.path import dirname, join
 from qgis.core import QgsMapLayerRegistry, QgsMessageLog
 from qgis.core import QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
-from PyQt5 import uic
-from PyQt5.QtCore import QCoreApplication, QObject, QThread
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QCoreApplication, QObject, QThread
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 
 from MultiDistanceBuffer_engine import Worker
 

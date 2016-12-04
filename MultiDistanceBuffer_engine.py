@@ -25,8 +25,8 @@ from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
 from qgis.core import QgsRectangle, QgsCoordinateTransform
 from qgis.core import QgsMapLayer, QgsExpression, QgsVectorFileWriter
 from qgis.analysis import QgsGeometryAnalyzer, QgsOverlayAnalyzer
-from PyQt5 import QtCore
-from PyQt5.QtCore import QCoreApplication, QVariant
+from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QCoreApplication, QVariant
 
 
 class Worker(QtCore.QObject):
