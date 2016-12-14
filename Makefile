@@ -49,7 +49,7 @@ PY_FILES = MultiDistanceBuffer.py \
 
 UI_FILES = ui_multidistancebuffer.ui
 
-EXTRAS = icon.png metadata.txt
+EXTRAS = multidistbuff.png metadata.txt
 
 COMPILED_RESOURCE_FILES = resources_rc.py
 

@@ -24,7 +24,7 @@ import glob
 import tempfile
 import uuid
 from os.path import dirname, join
-from qgis.core import QgsMapLayerRegistry, QgsMessageLog
+from qgis.core import QgsProject, QgsMessageLog
 from qgis.core import QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.PyQt import uic
@@ -92,7 +92,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
-        inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        inputlayer = QgsProject.instance().mapLayer(layerId)
         # Get the layer CRS
         self.layercrs = inputlayer.crs()
         # Should only selected features be considered
@@ -165,7 +165,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            #QgsMapLayerRegistry.instance().addMapLayer(result_layer)
+            #QgsProject.instance().addMapLayer(result_layer)
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             self.layerlistchanging = True
             self.layerlistchanging = False
@@ -185,7 +185,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # just in case
             if str(resultlayercopy.crs().authid())[:5] != 'EPSG:':
                 resultlayercopy.setCrs(self.layercrs)
-            QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
+            QgsProject.instance().addMapLayer(resultlayercopy)
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
             resultlayercopy.updateExtents()
@@ -260,7 +260,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def addDistance(self):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
-        thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        thelayer = QgsProject.instance().mapLayer(layerId)
         if thelayer is None:
             return
         # 0.0 is only meaningful for polygons
@@ -304,7 +304,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         # We know that all the layers in inputLayer are valid vector layers
-        thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        thelayer = QgsProject.instance().mapLayer(layerId)
         if thelayer is None:
             return
         if thelayer.geometryType() == QgsWkbTypes.PolygonGeometry:

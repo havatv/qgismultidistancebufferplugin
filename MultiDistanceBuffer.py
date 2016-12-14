@@ -21,7 +21,7 @@
 """
 import os.path
 # Import the PyQt and QGIS libraries
-from qgis.core import QgsMapLayerRegistry, QgsMapLayer, QgsWkbTypes
+from qgis.core import QgsProject, QgsMapLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QFileInfo, QSettings, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
@@ -78,7 +78,7 @@ class MultiDistanceBuffer:
     def initGui(self):
         # Create action that will start plugin configuration
         self.action = QAction(
-            QIcon(":/plugins/MultiDistanceBuffer/icon.png"),
+            QIcon(":/plugins/MultiDistanceBuffer/multidistbuff.png"),
             u"MultiDistanceBuffer", self.iface.mainWindow())
         # connect the action to the run method
         self.action.triggered.connect(self.run)
@@ -107,7 +107,7 @@ class MultiDistanceBuffer:
 
     # run method that performs all the real work
     def run(self):
-        layers = QgsMapLayerRegistry.instance().mapLayers()
+        layers = QgsProject.instance().mapLayers()
         layerslist = []
         for id in layers.keys():
             if layers[id].type() == QgsMapLayer.VectorLayer:

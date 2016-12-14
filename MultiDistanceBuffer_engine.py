@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry
+from qgis.core import QgsMessageLog
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
 from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
 from qgis.core import QgsRectangle, QgsCoordinateTransform
