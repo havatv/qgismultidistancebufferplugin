@@ -23,6 +23,7 @@ import os.path
 # Import the PyQt and QGIS libraries
 from qgis.core import QgsMapLayerRegistry, QgsMapLayer, QGis
 from PyQt4.QtCore import QFileInfo, QSettings, QCoreApplication
+from PyQt4.QtCore import QTranslator, qVersion
 from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
 import sys
