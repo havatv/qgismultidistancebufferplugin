@@ -107,12 +107,9 @@ class Worker(QtCore.QObject):
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
             layercopy.updateFields()  # Commit the attribute changes
             # Create the memory layer for the results
-            layeruri = 'Polygon?'
-            # Coordinate reference system needs to be specified
-            crstext = "PROJ4:%s" % layercopy.crs().toProj4()
-            layeruri = (layeruri + 'crs=' + crstext)
-            memresult = QgsVectorLayer(layeruri, self.outputlayername,
+            memresult = QgsVectorLayer('Polygon', self.outputlayername,
                                                               "memory")
+            memresult.setCrs(layercopy.crs())
             # Add attributes to the memory layer
             for distfield in layercopy.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([distfield])
