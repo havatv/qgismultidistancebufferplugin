@@ -169,30 +169,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             self.layerlistchanging = True
             self.layerlistchanging = False
-            # Create a (memory) copy of the result layer
-            layeruri = 'Polygon?'
-            # Coordinate reference system needs to be specified
-            # Use PROJ4 as it should be available for all layers
-            crstext = "PROJ4:%s" % self.layercrs.toProj4()
-            layeruri = (layeruri + 'crs=' + crstext)
-            resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
-                                                              "memory")
-            resfields = result_layer.dataProvider().fields()
-            for field in resfields:
-                resultlayercopy.dataProvider().addAttributes([field])
-            resultlayercopy.updateFields()
-            # If EPSG is not available, set the CRS to the original one,
-            # just in case
-            if str(resultlayercopy.crs().authid())[:5] != 'EPSG:':
-                resultlayercopy.setCrs(self.layercrs)
-            QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
-            for feature in result_layer.getFeatures():
-                resultlayercopy.dataProvider().addFeatures([feature])
-            resultlayercopy.updateExtents()
-            resultlayercopy.reload()
+            result_layer.setName(outputlayername)
+            QgsMapLayerRegistry.instance().addMapLayer(result_layer)
             self.iface.mapCanvas().refresh()
             result_layer = None
-            resultlayercopy = None
         else:
             # notify the user that something went wrong
             if not ok:
