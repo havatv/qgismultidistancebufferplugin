@@ -81,7 +81,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
-        self.layercrs = None  # The CRS of the layer
     # end of __init__
 
     def startWorker(self):
@@ -93,8 +92,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
-        # Get the layer CRS
-        self.layercrs = inputlayer.crs()
         # Should only selected features be considered
         selectedonly = self.selectedOnlyCB.isChecked()
         if selectedonly and inputlayer.selectedFeatureCount() == 0:
