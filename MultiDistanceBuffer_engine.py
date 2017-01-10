@@ -91,6 +91,7 @@ class Worker(QtCore.QObject):
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
     # end of __init__
 
+    # Should @pyqtSlot be used here?
     def run(self):
         bufferlayers = []
         try:

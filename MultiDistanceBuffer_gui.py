@@ -141,9 +141,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of startWorker
 
     def workerFinished(self, ok, ret):
-        """Handles the output from the worker and cleans up after the
-           worker has finished.
-           Makes a copy of the returned layer to fix selection issues"""
+        """Handles the output from the worker, adds the generated
+           layer to the legend and cleans up after the worker has
+           finished."""
         # clean up the worker and thread
         self.worker.deleteLater()
         self.thread.quit()
@@ -235,6 +235,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of reject
 
     def addDistance(self):
+        # Event handler - add (distance) button pressed
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
@@ -270,6 +271,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of addDistanceEnter
 
     def distanceSelectionChanged(self):
+        # Event handler
         if (self.bufferList.selectedIndexes() is None or
             len(self.bufferList.selectedIndexes()) == 0):
             self.removeButton.setEnabled(False)
@@ -278,6 +280,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of distanceSelectionChanged
 
     def layerSelectionChanged(self):
+        # Event handler - new layer selected
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         # We know that all the layers in inputLayer are valid vector layers
@@ -309,6 +312,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of layerSelectionChanged
 
     def removeDistance(self):
+        # Event handler - remove (distance) button pressed
         self.bufferList.setUpdatesEnabled(False)
         indexes = self.bufferList.selectedIndexes()
         indexes.sort()
