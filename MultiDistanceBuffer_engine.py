@@ -171,6 +171,7 @@ class Worker(QtCore.QObject):
                 j = j + 1
             # Update the layer extents (after adding features)
             memresult.updateExtents()
+            memresult.reload()
             # Remove references
             layercopy = None
             for outbufflayer in bufferlayers:

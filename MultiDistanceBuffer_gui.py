@@ -144,6 +144,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Handles the output from the worker, adds the generated
            layer to the legend and cleans up after the worker has
            finished."""
+        # For some reason, there are problems with selection
+        # highlighting if the returned memory layer is added.  To
+        # avoid this, a new memory layer is created and features are
+        # copied there"""
         # clean up the worker and thread
         self.worker.deleteLater()
         self.thread.quit()
@@ -162,14 +166,36 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            #QgsMapLayerRegistry.instance().addMapLayer(result_layer)
-            self.showInfo(self.tr('MultiDistanceBuffer finished'))
-            self.layerlistchanging = True
-            self.layerlistchanging = False
             result_layer.setName(outputlayername)
-            QgsMapLayerRegistry.instance().addMapLayer(result_layer)
+            self.showInfo(self.tr('MultiDistanceBuffer finished'))
+            #self.layerlistchanging = True
+            # Create a (memory) copy of the result layer
+            layeruri = 'polygon'
+            # Coordinate reference system apparently needs to be
+            # specified here too in order to avoid the select CRS
+            # dialogue.
+            # Use PROJ4 as it should be available for all layers
+            crstext = "PROJ4:%s" % result_layer.crs().toProj4()
+            layeruri = (layeruri + '?crs=' + crstext)
+            resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
+                                                              "memory")
+            # Set the CRS to the original CRS object,
+            resultlayercopy.setCrs(result_layer.crs())
+            resfields = result_layer.dataProvider().fields()
+            for field in resfields:
+                resultlayercopy.dataProvider().addAttributes([field])
+            resultlayercopy.updateFields()
+            for feature in result_layer.getFeatures():
+                resultlayercopy.dataProvider().addFeatures([feature])
+            resultlayercopy.commitChanges() # should not be necessary
+            resultlayercopy.updateExtents()
+            resultlayercopy.reload()
+            QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
+            #QgsMapLayerRegistry.instance().addMapLayer(result_layer)
             self.iface.mapCanvas().refresh()
             result_layer = None
+            resultlayercopy = None
+            #self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
