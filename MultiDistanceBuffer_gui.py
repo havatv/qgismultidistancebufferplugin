@@ -99,10 +99,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         # Make a copy of the input data set
         # (considering selected features or not)
-        # "None": no crs reprojection
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                None, "ESRI Shapefile",
+                inputlayer.crs(), "ESRI Shapefile",
                 selectedonly)
         if error:
             self.showWarning("Copying the input layer failed! ("
@@ -171,7 +170,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'polygon'
-            # Coordinate reference system apparently needs to be
+            # A coordinate reference system apparently needs to be
             # specified here too in order to avoid the select CRS
             # dialogue.
             # Use PROJ4 as it should be available for all layers
@@ -187,7 +186,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateFields()
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
-            resultlayercopy.commitChanges() # should not be necessary
+            resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.updateExtents()
             resultlayercopy.reload()
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
