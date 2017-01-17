@@ -125,14 +125,19 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                       self.workerlayername, selectedonly,
                       self.tempfilepathprefix)
         thread = QThread(self)
-        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.progress.connect(self.progressBar.setValue)
+        worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
-        worker.status.connect(self.workerInfo)
-        worker.progress.connect(self.progressBar.setValue)
-        thread.started.connect(worker.run)
+        worker.finished.connect(worker.deleteLater)
+        worker.error.connect(worker.deleteLater)
+        worker.finished.connect(thread.quit)
+        worker.error.connect(thread.quit)
+        thread.finished.connect(thread.deleteLater)
+        worker.moveToThread(thread)
         thread.start()
-        self.thread = thread
+        #self.thread = thread
         self.worker = worker
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
@@ -148,11 +153,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
         # copied there"""
-        # clean up the worker and thread
-        self.worker.deleteLater()
-        self.thread.quit()
-        self.thread.wait()
-        self.thread.deleteLater()
         # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
