@@ -171,7 +171,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # specified here in order to avoid the select CRS
             # dialogue.
             # Use PROJ4 as it should be available for all layers
-            crstext = "PROJ4:%s" % self.layercrs.toProj4()
+            crstext = "PROJ4:%s" % result_layer.toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
