@@ -169,16 +169,16 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
-            layeruri = 'polygon'
+            layeruri = 'Polygon?'
             # A coordinate reference system apparently needs to be
-            # specified here too in order to avoid the select CRS
+            # specified here in order to avoid the select CRS
             # dialogue.
             # Use PROJ4 as it should be available for all layers
             crstext = "PROJ4:%s" % result_layer.crs().toProj4()
-            layeruri = (layeruri + '?crs=' + crstext)
+            layeruri = (layeruri + 'crs=' + crstext)
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
-            # Set the CRS to the original CRS object,
+            # Set the CRS to the original CRS object
             resultlayercopy.setCrs(result_layer.crs())
             resfields = result_layer.dataProvider().fields()
             for field in resfields:
