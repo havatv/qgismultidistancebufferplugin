@@ -81,7 +81,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
-        self.layercrs = None  # The CRS of the layer
     # end of __init__
 
     def startWorker(self):
@@ -93,8 +92,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         inputlayer = QgsProject.instance().mapLayer(layerId)
-        # Get the layer CRS
-        self.layercrs = inputlayer.crs()
         # Should only selected features be considered
         selectedonly = self.selectedOnlyCB.isChecked()
         if selectedonly and inputlayer.selectedFeatureCount() == 0:
@@ -102,10 +99,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         # Make a copy of the input data set
         # (considering selected features or not)
-        # "None": no crs reprojection
         error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
                 self.layercopypath, inputlayer.dataProvider().encoding(),
-                self.layercrs, "ESRI Shapefile",
+                inputlayer.crs(), "ESRI Shapefile",
                 selectedonly)
         if error:
             self.showWarning("Copying the input layer failed! ("
@@ -171,25 +167,25 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.layerlistchanging = False
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
-            # Coordinate reference system needs to be specified
+            # A coordinate reference system apparently needs to be
+            # specified here in order to avoid the select CRS
+            # dialogue.
             # Use PROJ4 as it should be available for all layers
             crstext = "PROJ4:%s" % self.layercrs.toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
+            # Set the CRS to the original CRS object
+            resultlayercopy.setCrs(result_layer.crs())
             resfields = result_layer.dataProvider().fields()
             for field in resfields:
                 resultlayercopy.dataProvider().addAttributes([field])
             resultlayercopy.updateFields()
-            # If EPSG is not available, set the CRS to the original one,
-            # just in case
-            if str(resultlayercopy.crs().authid())[:5] != 'EPSG:':
-                resultlayercopy.setCrs(self.layercrs)
-            QgsProject.instance().addMapLayer(resultlayercopy)
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
             resultlayercopy.updateExtents()
             resultlayercopy.reload()
+            QgsProject.instance().addMapLayer(resultlayercopy)
             self.iface.mapCanvas().refresh()
             result_layer = None
             resultlayercopy = None

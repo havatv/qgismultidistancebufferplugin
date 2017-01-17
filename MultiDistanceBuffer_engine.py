@@ -106,13 +106,12 @@ class Worker(QtCore.QObject):
             # Add the distance attribute
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
             layercopy.updateFields()  # Commit the attribute changes
-            # Create the memory layer for the results
-            layeruri = 'Polygon?'
-            # Coordinate reference system needs to be specified
-            crstext = "PROJ4:%s" % layercopy.crs().toProj4()
-            layeruri = (layeruri + 'crs=' + crstext)
-            memresult = QgsVectorLayer(layeruri, self.outputlayername,
-                                                              "memory")
+            # Create the memory layer for the results (have to specify a
+            # CRS in order to avoid the select CRS dialogue)
+            memresult = QgsVectorLayer('Polygon?crs=EPSG:4326',
+                                       self.outputlayername, "memory")
+            # Set the real CRS
+            memresult.setCrs(layercopy.crs())
             # Add attributes to the memory layer
             for distfield in layercopy.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([distfield])
