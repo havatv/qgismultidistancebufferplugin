@@ -24,13 +24,14 @@ import glob
 import tempfile
 import uuid
 from os.path import dirname, join
-from qgis.core import QgsMapLayerRegistry, QgsMessageLog
-from qgis.core import QgsVectorFileWriter, QgsVectorLayer
-from qgis.core import QGis
 from PyQt4 import uic
 from PyQt4.QtCore import QCoreApplication, QObject, QThread
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
 from PyQt4.QtGui import QStandardItemModel
+from qgis.core import QgsMapLayerRegistry, QgsMessageLog
+from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+from qgis.core import QGis
+from qgis.utils import showPluginHelp
 
 from MultiDistanceBuffer_engine import Worker
 
@@ -45,6 +46,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Some translated text (to enable reuse)
         self.MULTIDISTANCEBUFFER = self.tr('MultiDistanceBuffer')
         self.CANCEL = self.tr('Cancel')
+        self.HELP = self.tr('Help')
         self.CLOSE = self.tr('Close')
         #self.HELP = self.tr('Help')
         self.OK = self.tr('OK')
@@ -57,9 +59,12 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
         cancelButton.setText(self.CANCEL)
         cancelButton.setEnabled(False)
+        helpButton = self.helpButton
+        helpButton.setText(self.HELP)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
         self.removeButton.setEnabled(False)
+
         # Connect the user interface signals
         self.addButton.clicked.connect(self.addDistance)
         self.removeButton.clicked.connect(self.removeDistance)
@@ -67,6 +72,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
         cancelButton.clicked.connect(self.killWorker)
+        helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
         self.inputLayer.currentIndexChanged.connect(self.layerSelectionChanged)
@@ -243,6 +249,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         QgsMessageLog.logMessage('Info: ' + text, self.MULTIDISTANCEBUFFER,
                                  QgsMessageLog.INFO)
     # end of showInfo
+
+    def giveHelp(self):
+        self.showInfo('Giving help')
+        #QDesktopServices.openUrl(QUrl.fromLocalFile(
+        #                 self.plugin_dir + "/help/html/index.html"))
+        showPluginHelp(None, "help/html/index")
+    # end of giveHelp
 
     def reject(self):
         """Reject override."""

@@ -73,3 +73,17 @@ maximum deviation), so this is not available to the user.
 
 The buffers are combined to form the multi-distance buffer using the
 *symDifference* function of *QgsGeometry*.
+
+Links
+=======
+
+`Multi-Distance Buffer Plugin`_
+
+`Multi-Distance Buffer code repository`_
+
+`Multi-Distance Buffer issues`_
+
+.. _Multi-Distance Buffer code repository: https://github.com/havatv/qgismultidistancebufferplugin.git
+.. _Multi-Distance Buffer Plugin: https://plugins.qgis.org/plugins/MultiDistanceBuffer/
+.. _Multi-Distance Buffer issues: https://github.com/havatv/qgismultidistancebufferplugin/issues
+

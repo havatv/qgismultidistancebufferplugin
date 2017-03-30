@@ -3,17 +3,17 @@
 <context>
     <name>MultiDistanceBuffer</name>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="116"/>
+        <location filename="MultiDistanceBuffer.py" line="121"/>
         <source>Information</source>
         <translation>Informasjon</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="116"/>
+        <location filename="MultiDistanceBuffer.py" line="121"/>
         <source>Vector layers not found</source>
         <translation>Fant ingen vektorlag</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="60"/>
+        <location filename="MultiDistanceBuffer.py" line="61"/>
         <source>&amp;Multiple Distance Buffer</source>
         <translation>&amp;Fleravstandsbuffer</translation>
     </message>
@@ -21,54 +21,59 @@
 <context>
     <name>MultiDistanceBufferDialog</name>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="46"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="47"/>
         <source>MultiDistanceBuffer</source>
         <translation>FlerAvstandsBuffer</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="47"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
         <source>Close</source>
         <translation>Lukk</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="52"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="158"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="175"/>
         <source>MultiDistanceBuffer finished</source>
         <translation>FlerAvstandsBuffer ferdig</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="179"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="207"/>
         <source>Aborted</source>
         <translation>Avbrutt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="181"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="209"/>
         <source>No layer created</source>
         <translation>Laget ble ikke laget</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="151"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="168"/>
         <source>Unable to delete temporary files...</source>
         <translation>Klarer ikke å slette midlertidige filer...</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="191"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="219"/>
         <source>Worker failed - exception: </source>
         <translation>Arbeidsprosessen feilet - avbrudd: </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="197"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="225"/>
         <source>Worker: </source>
         <translation>&quot;Arbeidsprosess: </translation>
+    </message>
+    <message>
+        <location filename="MultiDistanceBuffer_gui.py" line="49"/>
+        <source>Help</source>
+        <translation>Hjelp</translation>
     </message>
 </context>
 <context>
@@ -118,16 +123,21 @@
         <source>Output (buffer) layer</source>
         <translation>Ut-laget (buffer)</translation>
     </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="187"/>
+        <source>Help</source>
+        <translation>Hjelp</translation>
+    </message>
 </context>
 <context>
     <name>Worker</name>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="122"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="125"/>
         <source>Doing buffer distance </source>
         <translation>Utfører bufferavstand </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="190"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="196"/>
         <source>Delivering the layer...</source>
         <translation>Sender over laget...</translation>
     </message>
