@@ -19,6 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import math  # for beregning av segments to approximate
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
 from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
@@ -59,7 +60,7 @@ class Worker(QtCore.QObject):
                                 features be buffered.
         tempfilepath --         path to be used for temporary files
                                 (all files with this prefix will be
-                                deleted when the thread has finished.
+                                deleted when the thread has finished).
         """
 
         QtCore.QObject.__init__(self)  # Essential!
@@ -125,14 +126,48 @@ class Worker(QtCore.QObject):
                 self.status.emit(self.tr('Doing buffer distance ') +
                                  str(dist) + '...')
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
-                # The buffer operation (can only produce a Shapefile
-                # format dataset)
-                # parameters: layer, path to output data set,
-                # distance, selected only, dissolve, attribute index
-                ok = QgsGeometryAnalyzer().buffer(layercopy,
-                                outbuffername, dist, False, True, -1)
-                if not ok:
-                    self.status.emit('The buffer operation failed!')
+
+
+                #########################################################
+                segments = 5
+                tolerance = 2.0
+                segments = int(math.pi / (4.0 * math.acos(1.0 - (tolerance / dist))))
+                
+                bfeatures = []
+                # Go through the features and buffer each one
+                for feat in layercopy.getFeatures():
+                    bgeom = feat.geometry().buffer(dist, segments)
+                    bfeat = QgsFeature()
+                    bfeat.setGeometry(bgeom)
+                    bfeat.setAttributes([dist])
+                    bfeatures.append(bfeat)
+                # Create a new memory layer and add the features
+                fresultlayer = QgsVectorLayer('Polygon?crs=EPSG:4326',
+                                       self.outputlayername, "memory")
+                # Set the real CRS
+                fresultlayer.setCrs(layercopy.crs())
+                # Add attributes to the memory layer
+                for distfield in layercopy.dataProvider().fields().toList():
+                    fresultlayer.dataProvider().addAttributes([distfield])
+                fresultlayer.updateFields()
+                fresultlayer.dataProvider().addFeatures(bfeatures)
+                # Dissolve the buffered features
+                # Must store as a Shapefile format dataset
+                QgsGeometryAnalyzer().dissolve(fresultlayer, outbuffername)
+                #########################################################
+
+
+                ## The buffer operation (can only produce a Shapefile
+                ## format dataset)
+                ## parameters: layer, path to output data set,
+                ## distance, selected only, dissolve, attribute index
+                #ok = QgsGeometryAnalyzer().buffer(layercopy,
+                #                outbuffername, dist, False, True, -1)
+                #if not ok:
+                #    self.status.emit('The buffer operation failed!')
+
+
+
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
                 bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
