@@ -183,7 +183,6 @@
        <property name="title">
         <string>Options</string>
        </property>
-       <zorder>standardRB</zorder>
       </widget>
      </item>
      <item>
@@ -195,6 +194,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QRadioButton" name="standardRB">
+           <property name="toolTip">
+            <string>Standard means 5 segments per quarter circle and dataset buffering</string>
+           </property>
            <property name="text">
             <string>Standard</string>
            </property>
@@ -212,6 +214,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QRadioButton" name="segmentsRB">
+           <property name="toolTip">
+            <string>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</string>
+           </property>
            <property name="text">
             <string>Segments to approximate:</string>
            </property>
@@ -222,6 +227,9 @@
          </item>
          <item>
           <widget class="QSpinBox" name="segmentsSB">
+           <property name="toolTip">
+            <string/>
+           </property>
            <property name="maximum">
             <number>999</number>
            </property>
@@ -249,6 +257,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
           <widget class="QRadioButton" name="deviationRB">
+           <property name="toolTip">
+            <string>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</string>
+           </property>
            <property name="text">
             <string>Maximum deviation (map units):</string>
            </property>
@@ -259,6 +270,9 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="deviationSB">
+           <property name="toolTip">
+            <string/>
+           </property>
            <property name="decimals">
             <number>6</number>
            </property>

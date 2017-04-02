@@ -19,6 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import datetime # Testing... ???
 import math  # for beregning av segments to approximate
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
@@ -100,6 +101,7 @@ class Worker(QtCore.QObject):
 
     # Should @pyqtSlot be used here?
     def run(self):
+        self.status.emit('Run starts: ' + str(datetime.datetime.now()))
         bufferlayers = []
         try:
             layercopy = self.inpvl
@@ -130,23 +132,23 @@ class Worker(QtCore.QObject):
                 if self.abort is True:
                     break
                 self.status.emit(self.tr('Doing buffer distance ') +
-                                 str(dist) + '...')
+                                 str(dist) + '... ' + str(datetime.datetime.now()))
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
 
-
+                self.status.emit('Before buffer: ' + str(datetime.datetime.now()))
                 #########################################################
                 # Determine which buffer variant to use
                 if (self.segments > 0 or self.deviation > 0.0):
                     if (self.segments > 0):
                         segments = self.segments
-                        self.status.emit('Segments: ' + str(segments))
+                        #self.status.emit('Segments: ' + str(segments))
                     else:
                         tolerance = self.deviation
                         #tolerance = 0.1
                         segments = int(math.pi / (4.0 * math.acos(1.0 - 
                                    (tolerance / float(dist))))) + 1
-                        self.status.emit('Deviation, segments: ' + str(segments))
-                        segments = max(segments, 5)
+                        #self.status.emit('Deviation, segments: ' + str(segments))
+                        #segments = max(segments, 5)
                     bfeatures = []
                     # Go through the features and buffer each one
                     for feat in layercopy.getFeatures():
@@ -178,7 +180,7 @@ class Worker(QtCore.QObject):
                     if not ok:
                         self.status.emit('The buffer operation failed!')
                     ########################################################
-
+                self.status.emit('After buffer: ' + str(datetime.datetime.now()))
 
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
@@ -200,7 +202,7 @@ class Worker(QtCore.QObject):
                 bufferlayers.append(bufflayer)
                 bufflayer = None
                 # Calculate the current distance band
-                if j == 0:     # The innermost buffer
+                if j == 0:     # The innermost buffer, just add it
                     for midfeature in bufferlayers[j].getFeatures():
                         memresult.dataProvider().addFeatures([midfeature])
                 else:
@@ -242,6 +244,7 @@ class Worker(QtCore.QObject):
                 if memresult is not None:
                     self.status.emit(self.tr('Delivering the layer...'))
                     self.finished.emit(True, memresult)
+                    self.status.emit('After finish: ' + str(datetime.datetime.now()))
                     memresult = None
                 else:
                     self.finished.emit(False, None)
