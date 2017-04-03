@@ -21,57 +21,57 @@
 <context>
     <name>MultiDistanceBufferDialog</name>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="47"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
         <source>MultiDistanceBuffer</source>
         <translation>FlerAvstandsBuffer</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="49"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="51"/>
         <source>Close</source>
         <translation>Lukk</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="52"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="53"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="175"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="186"/>
         <source>MultiDistanceBuffer finished</source>
         <translation>FlerAvstandsBuffer ferdig</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="207"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="218"/>
         <source>Aborted</source>
         <translation>Avbrutt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="209"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="220"/>
         <source>No layer created</source>
         <translation>Laget ble ikke laget</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="168"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="179"/>
         <source>Unable to delete temporary files...</source>
         <translation>Klarer ikke å slette midlertidige filer...</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="219"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="231"/>
         <source>Worker failed - exception: </source>
         <translation>Arbeidsprosessen feilet - avbrudd: </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="225"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="237"/>
         <source>Worker: </source>
         <translation>&quot;Arbeidsprosess: </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="49"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
         <source>Help</source>
         <translation>Hjelp</translation>
     </message>
@@ -124,20 +124,55 @@
         <translation>Ut-laget (buffer)</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="187"/>
+        <location filename="ui_multidistancebuffer.ui" line="327"/>
         <source>Help</source>
         <translation>Hjelp</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="184"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="198"/>
+        <source>Standard means 5 segments per quarter circle and dataset buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="201"/>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="218"/>
+        <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="221"/>
+        <source>Segments to approximate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="264"/>
+        <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="267"/>
+        <source>Maximum deviation (map units):</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Worker</name>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="125"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="135"/>
         <source>Doing buffer distance </source>
         <translation>Utfører bufferavstand </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="196"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="248"/>
         <source>Delivering the layer...</source>
         <translation>Sender over laget...</translation>
     </message>

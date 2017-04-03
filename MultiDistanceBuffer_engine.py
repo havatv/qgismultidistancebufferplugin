@@ -20,6 +20,7 @@
  ***************************************************************************/
 """
 import datetime # Testing... ???
+import time # Testing ???
 import math  # for beregning av segments to approximate
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
@@ -101,7 +102,7 @@ class Worker(QtCore.QObject):
 
     # Should @pyqtSlot be used here?
     def run(self):
-        self.status.emit('Run starts: ' + str(datetime.datetime.now()))
+        #self.status.emit('Run starts: ' + str(datetime.datetime.now()))
         bufferlayers = []
         try:
             layercopy = self.inpvl
@@ -132,10 +133,10 @@ class Worker(QtCore.QObject):
                 if self.abort is True:
                     break
                 self.status.emit(self.tr('Doing buffer distance ') +
-                                 str(dist) + '... ' + str(datetime.datetime.now()))
+                                 str(dist) + '... ' + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
 
-                self.status.emit('Before buffer: ' + str(datetime.datetime.now()))
+                #self.status.emit('Before buffer: ' + str(datetime.datetime.now()))
                 #########################################################
                 # Determine which buffer variant to use
                 if (self.segments > 0 or self.deviation > 0.0):
@@ -150,15 +151,25 @@ class Worker(QtCore.QObject):
                         #self.status.emit('Deviation, segments: ' + str(segments))
                         #segments = max(segments, 5)
                     bfeatures = []
+
+                    multigeom = QgsGeometry()
                     # Go through the features and buffer each one
                     for feat in layercopy.getFeatures():
                         bgeom = feat.geometry().buffer(dist, segments)
+                        #if multigeom is None:
+                        #    multigeom = bgeom
+                        #else:
+                        #    multigeom.combine(bgeom)
                         bfeat = QgsFeature()
                         bfeat.setGeometry(bgeom)
                         bfeat.setAttributes([dist])
                         bfeatures.append(bfeat)
+                        ##time.sleep(0.01)
                     # Create a new memory layer and add the features
-                    fresultlayer = QgsVectorLayer('Polygon?crs=EPSG:4326',
+                    #bfeat = QgsFeature()
+                    #bfeat.setGeometry(multigeom)
+                    #bfeat.setAttributes([dist])
+                    fresultlayer = QgsVectorLayer('MultiPolygon?crs=EPSG:4326',
                                          self.outputlayername, "memory")
                     # Set the real CRS
                     fresultlayer.setCrs(layercopy.crs())
@@ -167,9 +178,12 @@ class Worker(QtCore.QObject):
                         fresultlayer.dataProvider().addAttributes([distfield])
                     fresultlayer.updateFields()
                     fresultlayer.dataProvider().addFeatures(bfeatures)
+                    #fresultlayer.dataProvider().addFeatures([bfeat])
                     # Dissolve the buffered features
                     # Must store as a Shapefile format dataset
+                    #self.status.emit('Before dissolve: ' + str(datetime.datetime.now()))
                     QgsGeometryAnalyzer().dissolve(fresultlayer, outbuffername)
+                    #self.status.emit('After dissolve: ' + str(datetime.datetime.now()))
                 else:
                     # The buffer operation (can only produce a Shapefile
                     # format dataset)
@@ -180,7 +194,7 @@ class Worker(QtCore.QObject):
                     if not ok:
                         self.status.emit('The buffer operation failed!')
                     ########################################################
-                self.status.emit('After buffer: ' + str(datetime.datetime.now()))
+                #self.status.emit('After buffer: ' + str(datetime.datetime.now()))
 
                 blayername = 'buff' + str(dist)
                 # Load the buffer data set
@@ -218,6 +232,7 @@ class Worker(QtCore.QObject):
                         newfeature.setGeometry(outergeom)
                         newfeature.setAttributes(outerfeature.attributes())
                         memresult.dataProvider().addFeatures([newfeature])
+                # Report progress
                 self.calculate_progress()
                 j = j + 1
             # Update the layer extents (after adding features)
@@ -244,7 +259,7 @@ class Worker(QtCore.QObject):
                 if memresult is not None:
                     self.status.emit(self.tr('Delivering the layer...'))
                     self.finished.emit(True, memresult)
-                    self.status.emit('After finish: ' + str(datetime.datetime.now()))
+                    #self.status.emit('After finish: ' + str(datetime.datetime.now()))
                     memresult = None
                 else:
                     self.finished.emit(False, None)

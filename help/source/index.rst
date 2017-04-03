@@ -23,8 +23,9 @@ distances.
 The resulting dataset consists of one (multi)polygon ("donut type")
 for each buffer distance.
 The (multi)polygons do not overlap.
-The attribute table will have one column / field named *distance*,
-that contains the (maximum) distance for the (multi)polygon.
+The attribute table of the result dataset will have one column /
+field named *distance*, that contains the (maximum) distance for the
+(multi)polygon.
 The memory layer containing the data set is added to the QGIS table
 of contents.
 
@@ -43,7 +44,6 @@ Negative and 0.0 buffer distances are allowed for polygon layers.
 
 Buffer distances can be added and deleted in the dialogue using the
 *Add* and *Remove* buttons.
-
 The keyboard can be used to add the buffer distances quickly (number
 followed by <enter>).
 
@@ -55,21 +55,38 @@ If there is no selection in the chosen layer, the default will be
 set to not only use selected features.
 The user can modify this behaviour with the checkbox.
 
+Three approaches to buffering are offered by the plugin.
+
+* *Standard*. Will use five segments to represent a quarter circle
+  for the buffer geometries in the result dataset.
+
+* *Segments to approximate*.  The user specifies the number of 
+  segments to use for a quarter circle.
+
+* *Maximum deviation*.  The user specifies the maximum radial
+  deviation from the specified buffer distances.
+  The number of segments per quarter circle will be calculated
+  based on the buffer distance, and will increase with increasing
+  buffer distances.
+ 
 Implementation
 ==================
 
-Buffers for all the distances are created using the *buffer*
-function of *QgsGeometryAnalyzer*.
+With the *standard* approach, buffers for all the distances are
+created using the *buffer* function of *QgsGeometryAnalyzer*.
+The *buffer* function of *QgsGeometryAnalyzer* does not support
+the specification of buffer accuracy (segments / arc vertex distance
+/ maximum deviation), so the default of 5 segments has to be used.
 
-The *buffer* function of *QgsGeometryAnalyzer* function does not
+For the other two approaches, the buffer function of *QgsGeometry*
+is used, and the resulting geometries are combined using the
+*dissolve* function of *QgsGeometryAnalyzer*.
+
+The *buffer* and *dissolve* functions of *QgsGeometryAnalyzer* do not
 support memory layers as output, so a temporary (using the Python
 *tempfile* module) *Shapefile format* dataset is created for each
 buffer distance.
-The temporary datasets are deleted later.
-
-The *buffer* function of *QgsGeometryAnalyzer* does not support the
-specification of buffer accuracy (segments / arc vertex distance /
-maximum deviation), so this is not available to the user.
+The temporary datasets are later deleted.
 
 The buffers are combined to form the multi-distance buffer using the
 *symDifference* function of *QgsGeometry*.
