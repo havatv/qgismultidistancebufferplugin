@@ -26,7 +26,7 @@ import tempfile
 import uuid
 from os.path import dirname, join
 from PyQt4 import uic
-from PyQt4.QtCore import QCoreApplication, QObject, QThread
+from PyQt4.QtCore import QCoreApplication, QObject, QThread, pyqtSignal
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
 from PyQt4.QtGui import QStandardItemModel
 from qgis.core import QgsMapLayerRegistry, QgsMessageLog
@@ -41,6 +41,9 @@ FORM_CLASS, _ = uic.loadUiType(join(
 
 
 class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
+
+    sig_abort_worker = pyqtSignal()
+
     def __init__(self, iface, parent=None):
         self.iface = iface
         self.plugin_dir = dirname(__file__)
@@ -73,6 +76,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
         cancelButton.clicked.connect(self.killWorker)
+        #self.cancelButton = cancelButton
         helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
@@ -149,6 +153,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker.finished.connect(thread.quit)
         worker.error.connect(thread.quit)
         thread.finished.connect(thread.deleteLater)
+        self.sig_abort_worker.connect(worker.kill)
+        #self.cancelButton.clicked.connect(worker.kill)
         worker.moveToThread(thread)
         thread.start()
         #self.thread = thread
@@ -239,9 +245,12 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def killWorker(self):
         """Kill the worker thread."""
-        if self.worker is not None:
-            self.showInfo('Killing worker')
-            self.worker.kill()
+        self.sig_abort_worker.emit()
+        self.showInfo('Trying to kill worker')
+
+        #if self.worker is not None:
+        #    self.showInfo('Killing worker')
+        #    self.worker.kill()
     # end of killWorker
 
     def showError(self, text):
