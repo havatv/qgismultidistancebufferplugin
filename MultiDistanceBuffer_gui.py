@@ -158,8 +158,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         #self.cancelButton.clicked.connect(worker.kill)
         worker.moveToThread(thread)
         thread.start()
-        #self.thread = thread
-        self.worker = worker  # Engine won't start without this!
+        self.thread = thread
+        self.worker = worker  # Engine won't start without this on Ubuntu!
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
