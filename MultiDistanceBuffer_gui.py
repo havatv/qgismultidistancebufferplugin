@@ -56,9 +56,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         okButton = self.buttonBox.button(QDialogButtonBox.Ok)
         okButton.setText(self.OK)
         okButton.setEnabled(False)
-        cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
-        cancelButton.setText(self.CANCEL)
-        cancelButton.setEnabled(False)
+        self.cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
+        self.cancelButton.setText(self.CANCEL)
+        self.cancelButton.setEnabled(False)
         helpButton = self.helpButton
         helpButton.setText(self.HELP)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
@@ -71,7 +71,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
-        cancelButton.clicked.connect(self.killWorker)
+        #cancelButton.clicked.connect(self.killWorker)
         helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
@@ -129,21 +129,22 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       self.tempfilepathprefix)
-        thread = QThread(self)
-        thread.started.connect(worker.run)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
         worker.finished.connect(worker.deleteLater)
         worker.error.connect(worker.deleteLater)
+        self.cancelButton.clicked.connect(worker.kill)
+        thread = QThread(self)
+        worker.moveToThread(thread)  # Must come before thread.started.connect!
+        thread.started.connect(worker.run)
         worker.finished.connect(thread.quit)
         worker.error.connect(thread.quit)
-        thread.finished.connect(thread.deleteLater)
-        worker.moveToThread(thread)
+        thread.finished.connect(thread.deleteLater) # Useful?
         thread.start()
         #self.thread = thread
-        self.worker = worker
+        #self.worker = worker
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -154,6 +155,11 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Handles the output from the worker, adds the generated
            layer to the legend and cleans up after the worker has
            finished."""
+        ## clean up the worker and thread
+        #self.worker.deleteLater()
+        #self.thread.quit()
+        #self.thread.wait()
+        #self.thread.deleteLater()
         # For some reason, there are problems with selection
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
@@ -171,7 +177,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            result_layer.setName(outputlayername)
+            #result_layer.setName(outputlayername) # 2.14
+            #result_layer.setLayerName(outputlayername) # from QGIS 2.16
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
@@ -196,7 +203,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateExtents()
             resultlayercopy.reload()
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
-            #QgsMapLayerRegistry.instance().addMapLayer(result_layer)
             self.iface.mapCanvas().refresh()
             result_layer = None
             resultlayercopy = None
