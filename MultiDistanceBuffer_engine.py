@@ -19,8 +19,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import datetime # Testing... ???
-import time # Testing ???
+#import datetime  # Testing... ???
+#import time  # Testing ???
 import math  # for beregning av segments to approximate
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
@@ -65,7 +65,8 @@ class Worker(QtCore.QObject):
                                 (all files with this prefix will be
                                 deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
-        deviation --            maximum deviation (apply if > 0 and segments > 0).
+        deviation --            maximum deviation (apply if > 0 and
+                                segments > 0).
         """
 
         QtCore.QObject.__init__(self)  # Essential!
@@ -102,7 +103,6 @@ class Worker(QtCore.QObject):
 
     # Should @pyqtSlot be used here?
     def run(self):
-        #self.status.emit('Run starts: ' + str(datetime.datetime.now()))
         bufferlayers = []
         try:
             layercopy = self.inpvl
@@ -127,15 +127,15 @@ class Worker(QtCore.QObject):
             for distfield in layercopy.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([distfield])
             memresult.updateFields()
-            buffergeomvector = [] # Not used by the "standard" method
+            buffergeomvector = []  # Not used by the "standard" method
 
             # Use feature increment for the non-"standard" methods
             if (self.segments > 0 or self.deviation > 0.0):
-                self.worktodo = layercopy.featureCount() * len(self.buffersizes)
+                self.worktodo = (layercopy.featureCount() *
+                                 len(self.buffersizes))
                 # The number of elements that is needed to increment the
                 # progressbar - set early in run()
                 self.increment = self.worktodo // 1000
-         
 
             # Do the buffering (order: smallest to largest distances):
             j = 0
@@ -143,22 +143,21 @@ class Worker(QtCore.QObject):
                 if self.abort is True:
                     break
                 self.status.emit(self.tr('Doing buffer distance ') +
-                                 str(dist) + '... ' + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
+                         str(dist) + '... '
+                         #+str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
+                         )
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
 
-                #self.status.emit('Before buffer: ' + str(datetime.datetime.now()))
                 #########################################################
                 # Determine which buffer variant to use
                 if (self.segments > 0 or self.deviation > 0.0):
                     if (self.segments > 0):
                         segments = self.segments
-                        #self.status.emit('Segments: ' + str(segments))
                     else:
                         tolerance = self.deviation
-                        segments = int(math.pi / (4.0 * math.acos(1.0 - 
+                        segments = int(math.pi / (4.0 * math.acos(1.0 -
                                    (tolerance / float(dist))))) + 1
                         segments = max(segments, 1)
-                        #self.status.emit('Deviation, segments: ' + str(segments))
                     multigeom = QgsGeometry()
                     # Go through the features and buffer and combine the
                     # feature geometries
@@ -176,7 +175,7 @@ class Worker(QtCore.QObject):
                             break
                     buffergeomvector.append(multigeom)
 
-                    newgeom = None   
+                    newgeom = None
                     if j == 0:     # Just add the innermost buffer
                         newgeom = buffergeomvector[j]
                     else:
@@ -199,11 +198,10 @@ class Worker(QtCore.QObject):
                     if not ok:
                         self.status.emit('The buffer operation failed!')
                     ########################################################
-                    #self.status.emit('After buffer: ' + str(datetime.datetime.now()))
-
                     blayername = 'buff' + str(dist)
                     # Load the buffer data set
-                    bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
+                    bufflayer = QgsVectorLayer(outbuffername, blayername,
+                                               "ogr")
                     # Check if the buffer data set is empty
                     if bufflayer.featureCount() == 0:
                         continue
@@ -215,7 +213,7 @@ class Worker(QtCore.QObject):
                             continue
                     # Set the buffer distance attribute to the current distance
                     for feature in bufflayer.getFeatures():
-                        attrs = {0: dist}  # Set the value of the first attribute
+                        attrs = {0: dist}  # Set the first attribute value
                         bufflayer.dataProvider().changeAttributeValues(
                                            {feature.id(): attrs})
                     bufferlayers.append(bufflayer)
@@ -241,7 +239,8 @@ class Worker(QtCore.QObject):
                     self.calculate_progress()
                 j = j + 1
             # Update the layer extents (after adding features)
-            self.status.emit(self.tr('Finished with buffer ') + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
+            #self.status.emit(self.tr('Finished with buffer ')
+            #  + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
 
             memresult.updateExtents()
             memresult.reload()
@@ -264,9 +263,7 @@ class Worker(QtCore.QObject):
                 self.finished.emit(False, None)
             else:
                 if memresult is not None:
-                    self.status.emit(self.tr('Delivering the layer...'))
                     self.finished.emit(True, memresult)
-                    #self.status.emit('After finish: ' + str(datetime.datetime.now()))
                     memresult = None
                 else:
                     self.finished.emit(False, None)

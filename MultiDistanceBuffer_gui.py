@@ -150,7 +150,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         thread.started.connect(worker.run)
         worker.finished.connect(thread.quit)
         worker.error.connect(thread.quit)
-        thread.finished.connect(thread.deleteLater) # Useful?
+        thread.finished.connect(thread.deleteLater)  # Useful?
         thread.start()
         #self.thread = thread
         #self.worker = worker
