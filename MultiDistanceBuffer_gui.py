@@ -140,6 +140,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                       self.tempfilepathprefix, segments, deviation)
         thread = QThread(self)
         thread.started.connect(worker.run)
+        #self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(worker.kill)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
@@ -152,7 +153,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker.moveToThread(thread)
         thread.start()
         #self.thread = thread
-        self.worker = worker
+        self.worker = worker  # Engine won't start without this!
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
