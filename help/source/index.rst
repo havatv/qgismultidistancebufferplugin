@@ -26,7 +26,7 @@ The (multi)polygons do not overlap.
 The attribute table of the result dataset will have one column /
 field named *distance*, that contains the (maximum) distance for the
 (multi)polygon.
-The memory layer containing the data set is added to the QGIS table
+The memory layer containing the dataset is added to the QGIS table
 of contents.
 
 If 100 and 200 are provided as distances, the result dataset will
@@ -78,18 +78,19 @@ The *buffer* function of *QgsGeometryAnalyzer* does not support
 the specification of buffer accuracy (segments / arc vertex distance
 / maximum deviation), so the default of 5 segments has to be used.
 
-For the other two approaches, the buffer function of *QgsGeometry*
-is used, and the resulting geometries are combined using the
-*dissolve* function of *QgsGeometryAnalyzer*.
-
-The *buffer* and *dissolve* functions of *QgsGeometryAnalyzer* do not
+The *buffer* function of *QgsGeometryAnalyzer* does not
 support memory layers as output, so a temporary (using the Python
 *tempfile* module) *Shapefile format* dataset is created for each
 buffer distance.
 The temporary datasets are later deleted.
 
-The buffers are combined to form the multi-distance buffer using the
-*symDifference* function of *QgsGeometry*.
+For the other two approaches, the *buffer* function of *QgsGeometry*
+is used, and the resulting buffer geometries are combined using the
+*dissolve* function of *QgsGeometry*.
+
+The buffers are combined to form the result multi-distance buffer
+dataset using the *symDifference* function of *QgsGeometry* for
+all the approaches.
 
 Links
 =======
