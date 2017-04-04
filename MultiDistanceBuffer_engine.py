@@ -60,7 +60,7 @@ class Worker(QtCore.QObject):
         buffersizes --          array of floats, sorted asc.
         outputlayername --      Name of the output vector layer.
         selectedonly --         (boolean) Should only selected
-                                features be buffered.
+                                features be buffered.  NOT USED!
         tempfilepath --         path to be used for temporary files
                                 (all files with this prefix will be
                                 deleted when the thread has finished).
@@ -127,6 +127,16 @@ class Worker(QtCore.QObject):
             for distfield in layercopy.dataProvider().fields().toList():
                 memresult.dataProvider().addAttributes([distfield])
             memresult.updateFields()
+            buffergeomvector = [] # Not used by the "standard" method
+
+            # Use feature increment for the non-"standard" methods
+            if (self.segments > 0 or self.deviation > 0.0):
+                self.worktodo = layercopy.featureCount() * len(self.buffersizes)
+                # The number of elements that is needed to increment the
+                # progressbar - set early in run()
+                self.increment = self.worktodo // 1000
+         
+
             # Do the buffering (order: smallest to largest distances):
             j = 0
             for dist in self.buffersizes:
@@ -145,45 +155,40 @@ class Worker(QtCore.QObject):
                         #self.status.emit('Segments: ' + str(segments))
                     else:
                         tolerance = self.deviation
-                        #tolerance = 0.1
                         segments = int(math.pi / (4.0 * math.acos(1.0 - 
                                    (tolerance / float(dist))))) + 1
+                        segments = max(segments, 1)
                         #self.status.emit('Deviation, segments: ' + str(segments))
-                        #segments = max(segments, 5)
-                    bfeatures = []
-
                     multigeom = QgsGeometry()
-                    # Go through the features and buffer each one
+                    # Go through the features and buffer and combine the
+                    # feature geometries
+                    i = 0
                     for feat in layercopy.getFeatures():
                         bgeom = feat.geometry().buffer(dist, segments)
-                        #if multigeom is None:
-                        #    multigeom = bgeom
-                        #else:
-                        #    multigeom.combine(bgeom)
-                        bfeat = QgsFeature()
-                        bfeat.setGeometry(bgeom)
-                        bfeat.setAttributes([dist])
-                        bfeatures.append(bfeat)
-                        ##time.sleep(0.01)
-                    # Create a new memory layer and add the features
-                    #bfeat = QgsFeature()
-                    #bfeat.setGeometry(multigeom)
-                    #bfeat.setAttributes([dist])
-                    fresultlayer = QgsVectorLayer('MultiPolygon?crs=EPSG:4326',
-                                         self.outputlayername, "memory")
-                    # Set the real CRS
-                    fresultlayer.setCrs(layercopy.crs())
-                    # Add attributes to the memory layer
-                    for distfield in layercopy.dataProvider().fields().toList():
-                        fresultlayer.dataProvider().addAttributes([distfield])
-                    fresultlayer.updateFields()
-                    fresultlayer.dataProvider().addFeatures(bfeatures)
-                    #fresultlayer.dataProvider().addFeatures([bfeat])
-                    # Dissolve the buffered features
-                    # Must store as a Shapefile format dataset
-                    #self.status.emit('Before dissolve: ' + str(datetime.datetime.now()))
-                    QgsGeometryAnalyzer().dissolve(fresultlayer, outbuffername)
-                    #self.status.emit('After dissolve: ' + str(datetime.datetime.now()))
+                        if i == 0:
+                            multigeom = bgeom
+                        else:
+                            multigeom = multigeom.combine(bgeom)
+                        i = i + 1
+                        self.calculate_progress()
+                        #QCoreApplication.processEvents() # does not help
+                        if self.abort is True:
+                            break
+                    buffergeomvector.append(multigeom)
+
+                    newgeom = None   
+                    if j == 0:     # Just add the innermost buffer
+                        newgeom = buffergeomvector[j]
+                    else:
+                        # Get the donut by subtracting the inner ring
+                        # from this ring
+                        outergeom = buffergeomvector[j]
+                        innergeom = buffergeomvector[j - 1]
+                        newgeom = outergeom.symDifference(innergeom)
+                    newfeature = QgsFeature()
+                    newfeature.setGeometry(newgeom)
+                    newfeature.setAttributes([dist])
+                    memresult.dataProvider().addFeatures([newfeature])
                 else:
                     # The buffer operation (can only produce a Shapefile
                     # format dataset)
@@ -194,48 +199,50 @@ class Worker(QtCore.QObject):
                     if not ok:
                         self.status.emit('The buffer operation failed!')
                     ########################################################
-                #self.status.emit('After buffer: ' + str(datetime.datetime.now()))
+                    #self.status.emit('After buffer: ' + str(datetime.datetime.now()))
 
-                blayername = 'buff' + str(dist)
-                # Load the buffer data set
-                bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
-                # Check if the buffer data set is empty
-                if bufflayer.featureCount() == 0:
-                    continue
-                if bufflayer.featureCount() == 1:
-                    thefeature = None
-                    for f in bufflayer.getFeatures():
-                        thefeature = f
-                    if (not thefeature) or (thefeature.geometry() is None):
+                    blayername = 'buff' + str(dist)
+                    # Load the buffer data set
+                    bufflayer = QgsVectorLayer(outbuffername, blayername, "ogr")
+                    # Check if the buffer data set is empty
+                    if bufflayer.featureCount() == 0:
                         continue
-                # Set the buffer distance attribute to the current distance
-                for feature in bufflayer.getFeatures():
-                    attrs = {0: dist}  # Set the value of the first attribute
-                    bufflayer.dataProvider().changeAttributeValues(
+                    if bufflayer.featureCount() == 1:
+                        thefeature = None
+                        for f in bufflayer.getFeatures():
+                            thefeature = f
+                        if (not thefeature) or (thefeature.geometry() is None):
+                            continue
+                    # Set the buffer distance attribute to the current distance
+                    for feature in bufflayer.getFeatures():
+                        attrs = {0: dist}  # Set the value of the first attribute
+                        bufflayer.dataProvider().changeAttributeValues(
                                            {feature.id(): attrs})
-                bufferlayers.append(bufflayer)
-                bufflayer = None
-                # Calculate the current distance band
-                if j == 0:     # The innermost buffer, just add it
-                    for midfeature in bufferlayers[j].getFeatures():
-                        memresult.dataProvider().addFeatures([midfeature])
-                else:
-                    for outerfeature in bufferlayers[j].getFeatures():
-                        # Get the donut by subtracting the inner ring
-                        # from this ring
-                        outergeom = outerfeature.geometry()
-                        for innerfeature in bufferlayers[j - 1].getFeatures():
-                            innergeom = innerfeature.geometry()
-                            newgeom = outergeom.symDifference(innergeom)
-                            outergeom = newgeom
-                        newfeature = QgsFeature()
-                        newfeature.setGeometry(outergeom)
-                        newfeature.setAttributes(outerfeature.attributes())
-                        memresult.dataProvider().addFeatures([newfeature])
-                # Report progress
-                self.calculate_progress()
+                    bufferlayers.append(bufflayer)
+                    bufflayer = None
+                    # Calculate the current distance band
+                    if j == 0:     # The innermost buffer, just add it
+                        for midfeature in bufferlayers[j].getFeatures():
+                            memresult.dataProvider().addFeatures([midfeature])
+                    else:
+                        for outerfeature in bufferlayers[j].getFeatures():
+                            # Get the donut by subtracting the inner ring
+                            # from this ring
+                            outergeom = outerfeature.geometry()
+                            for innerfeature in bufferlayers[j - 1].getFeatures():
+                                innergeom = innerfeature.geometry()
+                                newgeom = outergeom.symDifference(innergeom)
+                                outergeom = newgeom
+                            newfeature = QgsFeature()
+                            newfeature.setGeometry(outergeom)
+                            newfeature.setAttributes(outerfeature.attributes())
+                            memresult.dataProvider().addFeatures([newfeature])
+                    # Report progress
+                    self.calculate_progress()
                 j = j + 1
             # Update the layer extents (after adding features)
+            self.status.emit(self.tr('Finished with buffer ') + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
+
             memresult.updateExtents()
             memresult.reload()
             # Remove references
@@ -253,7 +260,7 @@ class Worker(QtCore.QObject):
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)
         else:
-            if self.abort:
+            if self.abort is True:
                 self.finished.emit(False, None)
             else:
                 if memresult is not None:
@@ -280,6 +287,7 @@ class Worker(QtCore.QObject):
     def kill(self):
         '''Kill the thread by setting the abort flag'''
         self.abort = True
+        self.status.emit("Worker killed")
     # end of kill
 
     def tr(self, message):
