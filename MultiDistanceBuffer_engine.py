@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2016 by Håvard Tveite
+        copyright            : (C) 2015-2017 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -22,12 +22,9 @@
 #import datetime  # Testing... ???
 #import time  # Testing ???
 import math  # for beregning av segments to approximate
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QGis
-from qgis.core import QgsVectorLayer, QgsFeature, QgsSpatialIndex
-from qgis.core import QgsFeatureRequest, QgsField, QgsGeometry
-from qgis.core import QgsRectangle, QgsCoordinateTransform
-from qgis.core import QgsMapLayer, QgsExpression, QgsVectorFileWriter
-from qgis.analysis import QgsGeometryAnalyzer, QgsOverlayAnalyzer
+from qgis.core import QgsVectorLayer, QgsFeature
+from qgis.core import QgsField, QgsGeometry
+from qgis.analysis import QgsGeometryAnalyzer
 from PyQt4 import QtCore
 from PyQt4.QtCore import QCoreApplication, QVariant
 
@@ -65,7 +62,7 @@ class Worker(QtCore.QObject):
                                 (all files with this prefix will be
                                 deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
-        deviation --            maximum deviation (apply if > 0 and
+        deviation --            maximum deviation (apply if > 0.0 and
                                 segments > 0).
         """
 
@@ -84,8 +81,8 @@ class Worker(QtCore.QObject):
         # Current percentage of progress - updated by
         # calculate_progress
         self.percentage = 0
-        # Number of features in the input layer - used by
-        # calculate_progress
+        # Number of buffer sizes - used by calculate_progress for
+        # the standard method
         self.worktodo = len(self.buffersizes)
         # The number of elements that is needed to increment the
         # progressbar - set early in run()
@@ -148,16 +145,19 @@ class Worker(QtCore.QObject):
                          )
                 outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
 
-                #########################################################
                 # Determine which buffer variant to use
                 if (self.segments > 0 or self.deviation > 0.0):
                     if (self.segments > 0):
                         segments = self.segments
+                        #self.status.emit("Segments")
                     else:
                         tolerance = self.deviation
-                        segments = int(math.pi / (4.0 * math.acos(1.0 -
-                                   (tolerance / float(dist))))) + 1
-                        segments = max(segments, 1)
+                        # Calculate the number of segments per quarter circle
+                        segments = 5
+                        if dist != 0.0:
+                            segments = int(math.pi / (4.0 * math.acos(1.0 -
+                                       (tolerance / float(abs(dist)))))) + 1
+                    segments = max(segments, 1)
                     multigeom = QgsGeometry()
                     # Go through the features and buffer and combine the
                     # feature geometries
@@ -175,6 +175,7 @@ class Worker(QtCore.QObject):
                             break
                     buffergeomvector.append(multigeom)
 
+                    # Compute the donut and add it to the result dataset
                     newgeom = None
                     if j == 0:     # Just add the innermost buffer
                         newgeom = buffergeomvector[j]
@@ -189,15 +190,14 @@ class Worker(QtCore.QObject):
                     newfeature.setAttributes([dist])
                     memresult.dataProvider().addFeatures([newfeature])
                 else:
-                    # The buffer operation (can only produce a Shapefile
-                    # format dataset)
+                    # The QgsGeometryAnalyzer().buffer operation can only
+                    # produce a Shapefile format dataset)
                     # parameters: layer, path to output data set,
                     # distance, selected only, dissolve, attribute index
                     ok = QgsGeometryAnalyzer().buffer(layercopy,
                                     outbuffername, dist, False, True, -1)
                     if not ok:
                         self.status.emit('The buffer operation failed!')
-                    ########################################################
                     blayername = 'buff' + str(dist)
                     # Load the buffer data set
                     bufflayer = QgsVectorLayer(outbuffername, blayername,
@@ -238,10 +238,10 @@ class Worker(QtCore.QObject):
                     # Report progress
                     self.calculate_progress()
                 j = j + 1
-            # Update the layer extents (after adding features)
             #self.status.emit(self.tr('Finished with buffer ')
             #  + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
 
+            # Update the layer extents (after adding features)
             memresult.updateExtents()
             memresult.reload()
             # Remove references

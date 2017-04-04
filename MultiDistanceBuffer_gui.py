@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2016 by Håvard Tveite
+        copyright            : (C) 2015-2017 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -133,7 +133,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if self.deviationRB.isChecked():
             deviation = self.deviationSB.value()
 
-        #self.showInfo('Before worker: ' + str(datetime.datetime.now()))
         self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
@@ -174,7 +173,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # avoid this, a new memory layer is created and features are
         # copied there"""
 
-        #self.showInfo('After worker1: ' + str(datetime.datetime.now()))
         # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
@@ -228,8 +226,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
-        #self.showInfo('After worker2: ' + str(datetime.datetime.now()))
-        #self.close()
     # end of workerFinished
 
     def workerError(self, exception_string):
@@ -269,7 +265,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of showInfo
 
     def giveHelp(self):
-        #self.showInfo('Giving help')
         #QDesktopServices.openUrl(QUrl.fromLocalFile(
         #                 self.plugin_dir + "/help/html/index.html"))
         showPluginHelp(None, "help/html/index")
@@ -277,8 +272,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def reject(self):
         """Reject override."""
-        # exit the dialog
-        # Remove temporary files
+        # exits the dialog
+        # Removes all temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
             tmpfiles = glob.glob(copypattern)
