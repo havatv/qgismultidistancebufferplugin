@@ -151,8 +151,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker.error.connect(thread.quit)
         thread.finished.connect(thread.deleteLater)  # Useful?
         thread.start()
-        #self.thread = thread
-        #self.worker = worker
+        self.thread = thread
+        self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
