@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2016 by Håvard Tveite
+        copyright            : (C) 2015-2017 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -19,18 +19,20 @@
  *                                                                         *
  ***************************************************************************/
 """
+#import datetime # Testing... ???
 import os
 import glob
 import tempfile
 import uuid
 from os.path import dirname, join
-from qgis.core import QgsProject, QgsMessageLog
-from qgis.core import QgsWkbTypes
-from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QThread
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
+from qgis.core import QgsProject, QgsMessageLog
+from qgis.core import QgsWkbTypes
+from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+from qgis.utils import showPluginHelp
 
 from MultiDistanceBuffer_engine import Worker
 
@@ -45,6 +47,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Some translated text (to enable reuse)
         self.MULTIDISTANCEBUFFER = self.tr('MultiDistanceBuffer')
         self.CANCEL = self.tr('Cancel')
+        self.HELP = self.tr('Help')
         self.CLOSE = self.tr('Close')
         #self.HELP = self.tr('Help')
         self.OK = self.tr('OK')
@@ -54,9 +57,11 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         okButton = self.buttonBox.button(QDialogButtonBox.Ok)
         okButton.setText(self.OK)
         okButton.setEnabled(False)
-        cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
-        cancelButton.setText(self.CANCEL)
-        cancelButton.setEnabled(False)
+        self.cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
+        self.cancelButton.setText(self.CANCEL)
+        self.cancelButton.setEnabled(False)
+        helpButton = self.helpButton
+        helpButton.setText(self.HELP)
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
         self.removeButton.setEnabled(False)
@@ -66,7 +71,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
-        cancelButton.clicked.connect(self.killWorker)
+        #cancelButton.clicked.connect(self.killWorker)
+        helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
         self.inputLayer.currentIndexChanged.connect(self.layerSelectionChanged)
@@ -119,25 +125,34 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
+        segments = 0
+        deviation = 0.0
+        #if self.segmentsRB.isChecked():
+        #    segments = self.segmentsSB.value()
+        #if self.deviationRB.isChecked():
+        #    deviation = self.deviationSB.value()
+
         self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
-                      self.tempfilepathprefix)
-        thread = QThread(self)
-        thread.started.connect(worker.run)
+                      #self.tempfilepathprefix)
+                      self.tempfilepathprefix, segments, deviation)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
         worker.finished.connect(worker.deleteLater)
         worker.error.connect(worker.deleteLater)
+        self.cancelButton.clicked.connect(worker.kill)
+        thread = QThread(self)
+        worker.moveToThread(thread)  # Must come before thread.started.connect!
+        thread.started.connect(worker.run)
         worker.finished.connect(thread.quit)
         worker.error.connect(thread.quit)
-        thread.finished.connect(thread.deleteLater)
-        worker.moveToThread(thread)
+        thread.finished.connect(thread.deleteLater)  # Useful?
         thread.start()
-        #self.thread = thread
-        self.worker = worker
+        self.thread = thread
+        self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -148,10 +163,16 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Handles the output from the worker, adds the generated
            layer to the legend and cleans up after the worker has
            finished."""
+        ## clean up the worker and thread
+        #self.worker.deleteLater()
+        #self.thread.quit()
+        #self.thread.wait()
+        #self.thread.deleteLater()
         # For some reason, there are problems with selection
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
         # copied there"""
+
         # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
@@ -165,10 +186,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            #QgsProject.instance().addMapLayer(result_layer)
+            #result_layer.setName(outputlayername) # 2.14
+            #result_layer.setLayerName(outputlayername) # from QGIS 2.16
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
-            self.layerlistchanging = True
-            self.layerlistchanging = False
+            #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
             # A coordinate reference system apparently needs to be
@@ -187,12 +208,14 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateFields()
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
+            resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.updateExtents()
             resultlayercopy.reload()
             QgsProject.instance().addMapLayer(resultlayercopy)
             self.iface.mapCanvas().refresh()
             result_layer = None
             resultlayercopy = None
+            #self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
@@ -203,7 +226,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
-        #self.close()
     # end of workerFinished
 
     def workerError(self, exception_string):
@@ -219,9 +241,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def killWorker(self):
         """Kill the worker thread."""
-        if self.worker is not None:
-            self.showInfo('Killing worker')
-            self.worker.kill()
+        #if self.worker is not None:
+        #    self.showInfo('Killing worker')
+        #    self.worker.kill()
     # end of killWorker
 
     def showError(self, text):
@@ -242,10 +264,16 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                                  QgsMessageLog.INFO)
     # end of showInfo
 
+    def giveHelp(self):
+        #QDesktopServices.openUrl(QUrl.fromLocalFile(
+        #                 self.plugin_dir + "/help/html/index.html"))
+        showPluginHelp(None, "help/html/index")
+    # end of giveHelp
+
     def reject(self):
         """Reject override."""
-        # exit the dialog
-        # Remove temporary files
+        # exits the dialog
+        # Removes all temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
             tmpfiles = glob.glob(copypattern)
