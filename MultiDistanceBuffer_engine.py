@@ -284,7 +284,7 @@ class Worker(QtCore.QObject):
     def kill(self):
         '''Kill the thread by setting the abort flag'''
         self.abort = True
-        self.status.emit("Worker killed")
+        self.status.emit("Worker told to abort")
     # end of kill
 
     def tr(self, message):

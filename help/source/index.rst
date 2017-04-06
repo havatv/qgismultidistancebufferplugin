@@ -60,11 +60,13 @@ Three approaches to buffering are offered by the plugin.
 * *Standard*. Will use five segments to represent a quarter circle
   for the buffer geometries in the result dataset.
 
-* *Segments to approximate*.  The user specifies the number of 
-  segments to use for a quarter circle.
+* *Segments to approximate* (new in version 2.0).
+  The user specifies the number of segments to use for a quarter
+  circle.
 
-* *Maximum deviation*.  The user specifies the maximum radial
-  deviation from the specified buffer distances.
+* *Maximum deviation* (new in version 2.0).
+  The user specifies the maximum radial deviation from the specified
+  buffer distances.
   The number of segments per quarter circle will be calculated
   based on the buffer distance, and will increase with increasing
   buffer distances.
@@ -84,9 +86,10 @@ support memory layers as output, so a temporary (using the Python
 buffer distance.
 The temporary datasets are later deleted.
 
-For the other two approaches, the *buffer* function of *QgsGeometry*
-is used, and the resulting buffer geometries are combined using the
-*dissolve* function of *QgsGeometry*.
+For the other two approaches (added in verion 2.0), the *buffer*
+function of *QgsGeometry* is used, and the resulting buffer
+geometries are combined using the *dissolve* function of
+*QgsGeometry*.
 
 The buffers are combined to form the result multi-distance buffer
 dataset using the *symDifference* function of *QgsGeometry* for
