@@ -137,19 +137,19 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       self.tempfilepathprefix, segments, deviation)
+        thread = QThread(self)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
-        worker.finished.connect(worker.deleteLater)
-        worker.error.connect(worker.deleteLater)
-        self.cancelButton.clicked.connect(worker.kill)
-        thread = QThread(self)
-        worker.moveToThread(thread)  # Must come before thread.started.connect!
-        thread.started.connect(worker.run)
+        self.cancelButton.clicked.connect(worker.kill)  # Before movetothread!
         worker.finished.connect(thread.quit)
-        worker.error.connect(thread.quit)
+        worker.finished.connect(worker.deleteLater)
+        worker.moveToThread(thread)  # Before thread.started.connect!
+        thread.started.connect(worker.run)
         thread.finished.connect(thread.deleteLater)  # Useful?
+        #worker.error.connect(worker.deleteLater)
+        #worker.error.connect(thread.quit)
         thread.start()
         self.thread = thread
         self.worker = worker  # QT requires this
