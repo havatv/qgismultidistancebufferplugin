@@ -68,8 +68,8 @@ class Worker(QtCore.QObject):
 
         QtCore.QObject.__init__(self)  # Essential!
         # Creating instance variables from the parameters
-        self.inpvl = inputvectorlayer
-        #self.inputpath = inputvectorlayerpath
+        #self.inpvl = inputvectorlayer
+        self.inputpath = inputvectorlayerpath
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
         self.selectedonly = selectedonly
@@ -102,8 +102,9 @@ class Worker(QtCore.QObject):
     def run(self):
         bufferlayers = []
         try:
-            layercopy = self.inpvl
-            self.inpvl = None  # Remove the reference to the layer
+            #layercopy = self.inpvl
+            layercopy = QgsVectorLayer(self.inputpath, "copy", "ogr")
+            #self.inpvl = None  # Remove the reference to the layer
             if layercopy is None:
                 self.finished.emit(False, None)
                 return
@@ -244,20 +245,25 @@ class Worker(QtCore.QObject):
             # Update the layer extents (after adding features)
             memresult.updateExtents()
             memresult.reload()
-            # Remove references
+
             layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            outbufflayers = None
         except:
-            # Remove references
-            layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            outbufflayers = None
             import traceback
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)
+            # Remove references
+            layercopy = None
+            for outbufflayer in bufferlayers:
+                outbufflayer = None
+            outbufflayers = None
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
+
+            self.progress = None
+            self.status = None
+            self.error = None
+            self.finished = None
         else:
             if self.abort is True:
                 self.finished.emit(False, None)
@@ -267,6 +273,18 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
+            # Remove references
+            for outbufflayer in bufferlayers:
+                outbufflayer = None
+            outbufflayers = None
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
+
+            self.progress = None
+            self.status = None
+            self.error = None
+            self.finished = None
     # end of run
 
     def calculate_progress(self):
@@ -284,7 +302,7 @@ class Worker(QtCore.QObject):
     def kill(self):
         '''Kill the thread by setting the abort flag'''
         self.abort = True
-        self.status.emit("Worker killed")
+        self.status.emit("Worker told to abort")
     # end of kill
 
     def tr(self, message):

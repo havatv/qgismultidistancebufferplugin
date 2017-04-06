@@ -127,29 +127,30 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             bufferdistances.append(float(self.listModel.item(i).text()))
         segments = 0
         deviation = 0.0
-        #if self.segmentsRB.isChecked():
-        #    segments = self.segmentsSB.value()
-        #if self.deviationRB.isChecked():
-        #    deviation = self.deviationSB.value()
+        if self.segmentsRB.isChecked():
+            segments = self.segmentsSB.value()
+        if self.deviationRB.isChecked():
+            deviation = self.deviationSB.value()
 
         self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
+        #worker = Worker(None, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       #self.tempfilepathprefix)
                       self.tempfilepathprefix, segments, deviation)
+        thread = QThread(self)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
+        self.cancelButton.clicked.connect(worker.kill) # Must come before movetothread
+        worker.finished.connect(thread.quit)
         worker.finished.connect(worker.deleteLater)
-        worker.error.connect(worker.deleteLater)
-        self.cancelButton.clicked.connect(worker.kill)
-        thread = QThread(self)
         worker.moveToThread(thread)  # Must come before thread.started.connect!
         thread.started.connect(worker.run)
-        worker.finished.connect(thread.quit)
-        worker.error.connect(thread.quit)
         thread.finished.connect(thread.deleteLater)  # Useful?
+        #worker.error.connect(worker.deleteLater)
+        #worker.error.connect(thread.quit)
         thread.start()
         self.thread = thread
         self.worker = worker  # QT requires this
