@@ -191,6 +191,7 @@ class Worker(QtCore.QObject):
                     newfeature.setAttributes([dist])
                     memresult.dataProvider().addFeatures([newfeature])
                 else:
+                    # With QGIS3, QgsGeometryAnalyzer causes problems
                     # The QgsGeometryAnalyzer().buffer operation can only
                     # produce a Shapefile format dataset)
                     # parameters: layer, path to output data set,

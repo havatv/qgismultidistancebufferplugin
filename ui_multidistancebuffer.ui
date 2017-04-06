@@ -169,7 +169,6 @@
      </layout>
     </widget>
    </item>
-
    <item>
     <widget class="Line" name="line">
      <property name="orientation">
@@ -195,14 +194,23 @@
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QRadioButton" name="standardRB">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="toolTip">
             <string>Standard means 5 segments per quarter circle and dataset buffering</string>
+           </property>
+           <property name="statusTip">
+            <string>Not available in QGIS 3 yet</string>
            </property>
            <property name="text">
             <string>Standard</string>
            </property>
-           <property name="checked">
+           <property name="checkable">
             <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
            <attribute name="buttonGroup">
             <string notr="true">optionButtonGroup</string>
@@ -267,6 +275,9 @@
            <property name="text">
             <string>Maximum deviation (map units):</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
            <attribute name="buttonGroup">
             <string notr="true">optionButtonGroup</string>
            </attribute>
@@ -310,7 +321,6 @@
      </item>
     </layout>
    </item>
-
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>

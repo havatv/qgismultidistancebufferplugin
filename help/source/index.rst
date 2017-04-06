@@ -59,6 +59,8 @@ Three approaches to buffering are offered by the plugin.
 
 * *Standard*. Will use five segments to represent a quarter circle
   for the buffer geometries in the result dataset.
+  *This option is currently not available for QGIS 3 due to
+  threading issues with QgsGeometryAnalyzer buffer"
 
 * *Segments to approximate*.  The user specifies the number of 
   segments to use for a quarter circle.
