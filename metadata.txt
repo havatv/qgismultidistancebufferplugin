@@ -11,7 +11,7 @@ about=The Multi-Distance Buffer plugin creates a multi-distance buffer vector da
 changelog=3.1.0 (2017-04)
     - added support for "segments to approximate" and maximum deviation
     - added help button
-    - disabled "standard" option
+    - disabled "standard" option, fixing the threading issue (#12)
     3.0.3 (2017-01)
     - fix thread cleanup issue (#14)
     3.0.2 (2016-12)
