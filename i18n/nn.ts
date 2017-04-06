@@ -41,32 +41,32 @@
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="186"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="191"/>
         <source>MultiDistanceBuffer finished</source>
         <translation>FlerAvstandsBuffer ferdig</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="218"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="222"/>
         <source>Aborted</source>
         <translation>Avbrutt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="220"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="224"/>
         <source>No layer created</source>
         <translation>Laget blei ikke oppretta</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="179"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="183"/>
         <source>Unable to delete temporary files...</source>
         <translation>Klarer ikkje å slette førebelse filer...</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="231"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="233"/>
         <source>Worker failed - exception: </source>
         <translation>Arbeidsprosessen feila - avbrot: </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="237"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="239"/>
         <source>Worker: </source>
         <translation>Arbeidsprosess: </translation>
     </message>
@@ -131,50 +131,45 @@
     <message>
         <location filename="ui_multidistancebuffer.ui" line="184"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Valg</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="198"/>
         <source>Standard means 5 segments per quarter circle and dataset buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard betyr fem segment per kvartsirkel og datasettbuffring</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="201"/>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="218"/>
         <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
-        <translation type="unfinished"></translation>
+        <translation>Antall segment per kvartsirkel&lt;br&gt;(fleire segment betyr lengre prosesseringstid</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="221"/>
         <source>Segments to approximate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Segment per kvartsirkel</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="264"/>
         <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segment per kvartsirkel tilpassast slik at avvikskrava blir halde (fleire segment for større bufferavstandar</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="267"/>
         <source>Maximum deviation (map units):</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt avvik (karteiningar)</translation>
     </message>
 </context>
 <context>
     <name>Worker</name>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="135"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="142"/>
         <source>Doing buffer distance </source>
         <translation>Utfører bufferavstand </translation>
-    </message>
-    <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="248"/>
-        <source>Delivering the layer...</source>
-        <translation>Sender over laget...</translation>
     </message>
 </context>
 </TS>
