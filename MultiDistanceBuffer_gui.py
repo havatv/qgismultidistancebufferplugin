@@ -143,10 +143,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
-        self.cancelButton.clicked.connect(worker.kill) # Must come before movetothread
+        self.cancelButton.clicked.connect(worker.kill)  # Before movetothread!
         worker.finished.connect(thread.quit)
         worker.finished.connect(worker.deleteLater)
-        worker.moveToThread(thread)  # Must come before thread.started.connect!
+        worker.moveToThread(thread)  # Before thread.started.connect!
         thread.started.connect(worker.run)
         thread.finished.connect(thread.deleteLater)  # Useful?
         #worker.error.connect(worker.deleteLater)
