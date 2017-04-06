@@ -133,8 +133,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             deviation = self.deviationSB.value()
 
         self.showInfo('Starting worker: ' + str(bufferdistances))
-        worker = Worker(layercopy, self.layercopypath, bufferdistances,
-        #worker = Worker(None, self.layercopypath, bufferdistances,
+        #worker = Worker(layercopy, self.layercopypath, bufferdistances,
+        worker = Worker(None, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       #self.tempfilepathprefix)
                       self.tempfilepathprefix, segments, deviation)
