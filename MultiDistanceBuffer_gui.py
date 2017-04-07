@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2016 by Håvard Tveite
+        copyright            : (C) 2015-2017 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -19,6 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+#import datetime # Testing... ???
 import os
 import glob
 import tempfile
@@ -125,26 +126,33 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
+        segments = 0
+        deviation = 0.0
+        if self.segmentsRB.isChecked():
+            segments = self.segmentsSB.value()
+        if self.deviationRB.isChecked():
+            deviation = self.deviationSB.value()
+
         self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
-                      self.tempfilepathprefix)
+                      self.tempfilepathprefix, segments, deviation)
+        thread = QThread(self)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
         worker.finished.connect(self.workerFinished)
         worker.error.connect(self.workerError)
-        worker.finished.connect(worker.deleteLater)
-        worker.error.connect(worker.deleteLater)
-        self.cancelButton.clicked.connect(worker.kill)
-        thread = QThread(self)
-        worker.moveToThread(thread)  # Must come before thread.started.connect!
-        thread.started.connect(worker.run)
+        self.cancelButton.clicked.connect(worker.kill)  # Before movetothread!
         worker.finished.connect(thread.quit)
-        worker.error.connect(thread.quit)
-        thread.finished.connect(thread.deleteLater) # Useful?
+        worker.finished.connect(worker.deleteLater)
+        worker.moveToThread(thread)  # Before thread.started.connect!
+        thread.started.connect(worker.run)
+        thread.finished.connect(thread.deleteLater)  # Useful?
+        #worker.error.connect(worker.deleteLater)
+        #worker.error.connect(thread.quit)
         thread.start()
-        #self.thread = thread
-        #self.worker = worker
+        self.thread = thread
+        self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -164,6 +172,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
         # copied there"""
+
         # Remove temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
@@ -217,7 +226,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
-        #self.close()
     # end of workerFinished
 
     def workerError(self, exception_string):
@@ -233,9 +241,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def killWorker(self):
         """Kill the worker thread."""
-        if self.worker is not None:
-            self.showInfo('Killing worker')
-            self.worker.kill()
+        #if self.worker is not None:
+        #    self.showInfo('Killing worker')
+        #    self.worker.kill()
     # end of killWorker
 
     def showError(self, text):
@@ -257,7 +265,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of showInfo
 
     def giveHelp(self):
-        self.showInfo('Giving help')
         #QDesktopServices.openUrl(QUrl.fromLocalFile(
         #                 self.plugin_dir + "/help/html/index.html"))
         showPluginHelp(None, "help/html/index")
@@ -265,8 +272,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def reject(self):
         """Reject override."""
-        # exit the dialog
-        # Remove temporary files
+        # exits the dialog
+        # Removes all temporary files
         try:
             copypattern = self.tempfilepathprefix + '*'
             tmpfiles = glob.glob(copypattern)
