@@ -17,8 +17,8 @@ Functionality
 ==================
 
 The **Multi-Distance Buffer** QGIS plugin creates a multi-distance /
-multi-zone vector dataset from an input vector layer and a set of
-distances.
+multi-zone / multi-ring vector dataset from an input vector layer
+and a set of distances.
 
 The resulting dataset consists of one (multi)polygon ("donut type")
 for each buffer distance.
@@ -40,8 +40,7 @@ The buffer distances (decimal numbers) can be specified by the user
 in any order.
 The list will be kept numerically sorted by the Plugin.
 
-Negative and 0.0 buffer distances are allowed for
-polygon layers.
+Negative and 0.0 buffer distances are allowed for polygon layers.
 Buffering a polygon with a negative buffer distance means shrinking
 the polygon and is also known as a *setback*.
 
