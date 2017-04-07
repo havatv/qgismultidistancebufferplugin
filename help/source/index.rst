@@ -16,7 +16,7 @@ Contents:
 Functionality
 ==================
 
-The Multi-Distance Buffer plugin creates a multi-distance /
+The **Multi-Distance Buffer** QGIS plugin creates a multi-distance /
 multi-zone / multi-ring vector dataset from an input vector layer
 and a set of distances.
 
@@ -57,16 +57,19 @@ The user can modify this behaviour with the checkbox.
 
 Three approaches to buffering are offered by the plugin.
 
-* *Standard*. Will use five segments to represent a quarter circle
+*Standard*
+  Will use five segments to represent a quarter circle
   for the buffer geometries in the result dataset.
 
   *Note: The "standard" option is currently not available for QGIS 3
   due to threading issues with QgsGeometryAnalyzer buffer*
 
-* *Segments to approximate*.  The user specifies the number of 
+*Segments to approximate*
+  The user specifies the number of 
   segments to use for a quarter circle.
 
-* *Maximum deviation*.  The user specifies the maximum radial
+*Maximum deviation*.
+  The user specifies the maximum radial
   deviation from the specified buffer distances.
   The number of segments per quarter circle will be calculated
   based on the buffer distance, and will increase with increasing
