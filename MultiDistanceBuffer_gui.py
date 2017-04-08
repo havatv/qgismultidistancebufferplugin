@@ -68,6 +68,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
         # Connect the user interface signals
         self.addButton.clicked.connect(self.addDistance)
+        self.addringsButton.clicked.connect(self.addRings)
         self.removeButton.clicked.connect(self.removeDistance)
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
@@ -321,6 +322,41 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.addDistance()
     # end of addDistanceEnter
 
+    def addRings(self):
+        # Event handler - add (rings) button pressed
+        layerindex = self.inputLayer.currentIndex()
+        layerId = self.inputLayer.itemData(layerindex)
+        thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        if thelayer is None:
+            return
+        # 0.0 is only meaningful for polygons
+        if (float(self.startSB.value()) == 0.0
+            and not thelayer.geometryType() == QGis.Polygon):
+            self.showInfo('Buffer radius 0 is not accepted')
+            return
+        start = self.startSB.value()
+        delta = self.widthsSB.value()
+        for i in range(self.ringsSB.value()):
+            buffdist = start + delta * i
+        
+            for i in range(self.listModel.rowCount()):
+                # Check if the value is already in the list
+                if self.listModel.item(i).text() == str(buffdist):
+                    break
+                else:
+                    # Maintain a sorted list of distances
+                    if (float(self.listModel.item(i).text()) >
+                                     float(str(buffdist))):
+                        item = QStandardItem(str(buffdist))
+                        self.listModel.insertRow(i, item)
+                        break
+            item = QStandardItem(str(buffdist))
+            self.listModel.appendRow(item)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+    # end of addRings
+
+
+
     def distanceSelectionChanged(self):
         # Event handler
         if (self.bufferList.selectedIndexes() is None or
@@ -341,16 +377,21 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if thelayer.geometryType() == QGis.Polygon:
             # Allow negative buffer distances for polygon layers
             self.bufferSB.setMinimum(-999999999.0)
+            self.startSB.setMinimum(-999999999.0)
         else:
             # Allow only positive buffer distances for point and line layers
             self.bufferSB.setMinimum(0.0)
+            self.startSB.setMinimum(0.0)
             i = 0
             # Remove all negative buffer distance values
             while i < self.listModel.rowCount():
-                if float(self.listModel.item(i).text()) < 0.0:
+                if float(self.listModel.item(i).text()) <= 0.0:
                     self.listModel.removeRow(i)
                 else:
                     i = i + 1
+            if self.startSB.value() <= 0.0:
+                self.startSB.setValue(100.0)
+
             # Disable the OK button if no buffer distances are specified
             if self.listModel.rowCount() == 0:
                 self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
