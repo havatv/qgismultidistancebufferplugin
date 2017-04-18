@@ -287,7 +287,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of reject
 
     def addDistance(self, buffdist):
-        #self.showInfo('Adding distance: ' + str(buffdist))
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
@@ -306,7 +305,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 # Maintain a sorted list of distances
                 if (float(self.listModel.item(i).text()) >
                                  buffdist):
-                                 # float(str(self.bufferSB.value()))):
                     item = QStandardItem(str(buffdist))
                     self.listModel.insertRow(i, item)
                     return
