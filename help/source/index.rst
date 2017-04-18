@@ -49,6 +49,10 @@ Buffer distances can be added and deleted in the dialogue using the
 The keyboard can be used to add the buffer distances quickly (number
 followed by <enter>).
 
+Fixed increment buffer distances can be added under **Add multiple
+zones**, specifying the number of zones, the width of each zone and
+the start value.
+
 A checkbox (*Use only selected features*) can be used to choose to
 only buffer around selected features.
 If the user selects a layer with a selection, the default will be
