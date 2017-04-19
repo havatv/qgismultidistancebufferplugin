@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>588</height>
+    <width>690</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,7 +57,7 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Buffer distance</string>
+           <string>Buffer distance:</string>
           </property>
          </widget>
         </item>
@@ -76,6 +76,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="addButton">
+          <property name="toolTip">
+           <string>Add the distance</string>
+          </property>
           <property name="text">
            <string>Add</string>
           </property>
@@ -142,6 +145,13 @@
     </widget>
    </item>
    <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="selectedOnlyCB">
      <property name="enabled">
       <bool>true</bool>
@@ -164,7 +174,11 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLineEdit" name="outputLayerName"/>
+       <widget class="QLineEdit" name="outputLayerName">
+        <property name="toolTip">
+         <string>The name of the output layer</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
