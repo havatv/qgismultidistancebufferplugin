@@ -65,11 +65,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         closeButton = self.buttonBox.button(QDialogButtonBox.Close)
         closeButton.setText(self.CLOSE)
         self.removeButton.setEnabled(False)
+        self.clearButton.setEnabled(False)
 
         # Connect the user interface signals
         self.addButton.clicked.connect(self.addDistanceClick)
         self.addringsButton.clicked.connect(self.addRings)
         self.removeButton.clicked.connect(self.removeDistance)
+        self.clearButton.clicked.connect(self.clearDistances)
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
@@ -103,7 +105,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Should only selected features be considered
         selectedonly = self.selectedOnlyCB.isChecked()
         if selectedonly and inputlayer.selectedFeatureCount() == 0:
-            self.showWarning("The layer has no selected features!")
+            self.showWarning(self.tr("The layer has no selected features!"))
             return
         # Make a copy of the input data set
         # (considering selected features or not)
@@ -134,7 +136,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if self.deviationRB.isChecked():
             deviation = self.deviationSB.value()
 
-        self.showInfo('Starting worker: ' + str(bufferdistances))
+        #self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       self.tempfilepathprefix, segments, deviation)
@@ -295,7 +297,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # 0.0 is only meaningful for polygons
         if (buffdist == 0.0
             and not thelayer.geometryType() == QGis.Polygon):
-            self.showInfo('Buffer radius 0 is only accepted for polygons')
+            self.showInfo(
+                self.tr('Buffer radius 0 is only accepted for polygons'))
             return
         for i in range(self.listModel.rowCount()):
             # Check if the value is already in the list
@@ -311,6 +314,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         item = QStandardItem(str(buffdist))
         self.listModel.appendRow(item)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.clearButton.setEnabled(True)
     # end of addDistance
 
     def addDistanceClick(self):
@@ -394,7 +398,18 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferList.setUpdatesEnabled(True)
         if self.listModel.rowCount() == 0:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.clearButton.setEnabled(False)
         self.removeButton.setEnabled(False)
+    # end of removeDistance
+
+    def clearDistances(self):
+        # Event handler - clear (distance) button pressed
+        self.bufferList.setUpdatesEnabled(False)
+        self.listModel.removeRows(0, self.listModel.rowCount())
+        self.bufferList.setUpdatesEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.removeButton.setEnabled(False)
+        self.clearButton.setEnabled(False)
     # end of removeDistance
 
     def tr(self, message):
