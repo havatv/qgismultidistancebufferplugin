@@ -32,9 +32,10 @@ of contents.
 If 100 and 200 are provided as distances, the result dataset will
 consist of two zones / bands / (multi)polygons - one will contain
 all areas that are within 100 units from the geometries of the input
-vector layer (including the geometries themselves), the other will
-contain all areas that are from 100 to 200 units from the geometries
-of the input vector layer.
+vector layer (including the geometries themselves) and will have its
+*distance* field set to 100; the other will contain all areas that
+are from 100 to 200 units from the geometries of the input vector
+layer and will have its *distance* field set to 200.
 
 The buffer distances (decimal numbers) can be specified by the user
 in any order.
@@ -44,10 +45,16 @@ Negative and 0.0 buffer distances are allowed for polygon layers.
 Buffering a polygon with a negative buffer distance means shrinking
 the polygon and is also known as a *setback*.
 
-Buffer distances can be added and deleted in the dialogue using the
-*Add* and *Remove* buttons.
-The keyboard can be used to add the buffer distances quickly (number
+Buffer distances can be added and removed in the dialogue using the
+*Add*, *Remove* and *Clear* buttons.
+The *Remove* button removes the selected entries, while the *Clear*
+button removes all entries.
+The keyboard can be used to add buffer distances quickly (number
 followed by <enter>).
+
+Fixed increment buffer distances can be added under **Add multiple
+zones**, specifying the number of zones, the width of each zone and
+the start value.
 
 A checkbox (*Use only selected features*) can be used to choose to
 only buffer around selected features.
