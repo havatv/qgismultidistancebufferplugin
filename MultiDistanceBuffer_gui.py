@@ -306,8 +306,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 return
             else:
                 # Maintain a sorted list of distances
-                if (float(self.listModel.item(i).text()) >
-                                 buffdist):
+                if (float(self.listModel.item(i).text()) > buffdist):
                     item = QStandardItem(str(buffdist))
                     self.listModel.insertRow(i, item)
                     return
@@ -368,7 +367,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.bufferSB.setMinimum(0.0)
             self.startSB.setMinimum(0.0)
             i = 0
-            # Remove all negative buffer distance values
+            # Remove all 0 or negative buffer distance values
             while i < self.listModel.rowCount():
                 if float(self.listModel.item(i).text()) <= 0.0:
                     self.listModel.removeRow(i)
@@ -410,7 +409,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.removeButton.setEnabled(False)
         self.clearButton.setEnabled(False)
-    # end of removeDistance
+    # end of clearDistance
 
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
