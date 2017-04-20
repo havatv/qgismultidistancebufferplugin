@@ -246,17 +246,20 @@ class Worker(QtCore.QObject):
             # Update the layer extents (after adding features)
             memresult.updateExtents()
             memresult.reload()
-
-            layercopy = None
-        except:
-            import traceback
-            self.error.emit(traceback.format_exc())
-            self.finished.emit(False, None)
             # Remove references
             layercopy = None
             for outbufflayer in bufferlayers:
                 outbufflayer = None
             bufferlayers = None
+        except:
+            # Remove references
+            layercopy = None
+            for outbufflayer in bufferlayers:
+                outbufflayer = None
+            bufferlayers = None
+            import traceback
+            self.error.emit(traceback.format_exc())
+            self.finished.emit(False, None)
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
