@@ -128,120 +128,120 @@
         <source>Output (buffer) layer</source>
         <translation>Ut-laget (buffer)</translation>
     </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="60"/>
-        <source>Buffer distance:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="80"/>
-        <source>Add the distance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="153"/>
-        <source>Remove the selected entries</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="163"/>
-        <source>Remove all entries</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="166"/>
-        <source>Clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="190"/>
-        <source>Add multiple zones</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="199"/>
-        <source>Number:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="206"/>
-        <source>Number of zones to add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="222"/>
-        <source>Width:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="229"/>
-        <source>The width of each zone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="248"/>
-        <source>Start:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="255"/>
-        <source>The start value (innermost buffer distance)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="271"/>
-        <source>Add the zones</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="315"/>
-        <source>The name of the output layer</source>
-        <translation type="unfinished"></translation>
+bb    <message>
+        <location filename="ui_multidistancebuffer.ui" line="489"/>
+        <source>Help</source>
+        <translation>Hjelp</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="334"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Valg</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="351"/>
         <source>Standard means 5 segments per quarter circle and dataset buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard betyr fem segment per kvartsirkel og datasettbuffring</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="354"/>
         <source>Not available in QGIS 3 yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikkje tilgjengeleg i QGIS 3 ennå</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="357"/>
         <source>Standard</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="377"/>
         <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
-        <translation type="unfinished"></translation>
+        <translation>Antall segment per kvartsirkel&lt;br&gt;(fleire segment betyr lengre prosesseringstid</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="380"/>
         <source>Segments to approximate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Segment per kvartsirkel</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="423"/>
         <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segment per kvartsirkel tilpassast slik at avvikskrava blir halde (fleire segment for større bufferavstandar</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="426"/>
         <source>Maximum deviation (map units):</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimalt avvik (karteiningar)</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="489"/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
+        <location filename="ui_multidistancebuffer.ui" line="60"/>
+        <source>Buffer distance:</source>
+        <translation>Bufferavstand</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="80"/>
+        <source>Add the distance</source>
+        <translation>Legg til avstanden</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="153"/>
+        <source>Remove the selected entries</source>
+        <translation>Fjern dei valgte avstandane</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="163"/>
+        <source>Remove all entries</source>
+        <translation>Fjern alle avstandane</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="166"/>
+        <source>Clear</source>
+        <translation>Fjern alle</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="190"/>
+        <source>Add multiple zones</source>
+        <translation>Legg til fleire soner</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="199"/>
+        <source>Number:</source>
+        <translation>Tal:</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="206"/>
+        <source>Number of zones to add</source>
+        <translation>Kor mange soner skal leggast til</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="222"/>
+        <source>Width:</source>
+        <translation>Breidde:</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="229"/>
+        <source>The width of each zone</source>
+        <translation>Breidda til kvar sone</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="248"/>
+        <source>Start:</source>
+        <translation>Start:</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="255"/>
+        <source>The start value (innermost buffer distance)</source>
+        <translation>Startverdien (den inste bufferavstanden)</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="271"/>
+        <source>Add the zones</source>
+        <translation>Legg til sonene</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="315"/>
+        <source>The name of the output layer</source>
+        <translation>Namnet til ut-laget</translation>
     </message>
 </context>
 <context>

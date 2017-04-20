@@ -166,8 +166,7 @@
     <message>
         <location filename="ui_multidistancebuffer.ui" line="423"/>
         <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
-        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segment per kvartsirkel tilpasses slik at avvikskravene tilfredsstilles (flere segme
-nt for større bufferavstander</translation>
+        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segment per kvartsirkel tilpasses slik at avvikskravene tilfredsstilles (flere segment for større bufferavstander</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="426"/>
