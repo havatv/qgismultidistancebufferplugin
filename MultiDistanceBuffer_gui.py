@@ -29,9 +29,9 @@ from PyQt4 import uic
 from PyQt4.QtCore import QCoreApplication, QObject, QThread
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QStandardItem
 from PyQt4.QtGui import QStandardItemModel
-from qgis.core import QgsMapLayerRegistry, QgsMessageLog
+from qgis.core import QgsMessageLog
+from qgis.core import QgsMapLayerRegistry, QGis
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
-from qgis.core import QGis
 from qgis.utils import showPluginHelp
 
 from MultiDistanceBuffer_engine import Worker
