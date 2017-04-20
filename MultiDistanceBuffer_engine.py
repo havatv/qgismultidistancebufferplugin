@@ -251,6 +251,9 @@ class Worker(QtCore.QObject):
             for outbufflayer in bufferlayers:
                 outbufflayer = None
             bufferlayers = None
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
         except:
             # Remove references
             layercopy = None
@@ -263,7 +266,6 @@ class Worker(QtCore.QObject):
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
-
             self.progress = None
             self.status = None
             self.error = None
@@ -277,14 +279,6 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
-            # Remove references
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            bufferlayers = None
-            for buffgeom in buffergeomvector:
-                buffgeom = None
-            buffergeomvector = None
-
             self.progress = None
             self.status = None
             self.error = None
