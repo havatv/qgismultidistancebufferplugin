@@ -29,8 +29,8 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QThread
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
-from qgis.core import QgsProject, QgsMessageLog
-from qgis.core import QgsWkbTypes
+from qgis.core import QgsMessageLog
+from qgis.core import QgsProject, QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.utils import showPluginHelp
 
