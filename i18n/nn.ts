@@ -3,17 +3,17 @@
 <context>
     <name>MultiDistanceBuffer</name>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="116"/>
+        <location filename="MultiDistanceBuffer.py" line="122"/>
         <source>Information</source>
         <translation>Informasjon</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="116"/>
+        <location filename="MultiDistanceBuffer.py" line="122"/>
         <source>Vector layers not found</source>
         <translation>Fant ikke vektorlag</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer.py" line="60"/>
+        <location filename="MultiDistanceBuffer.py" line="62"/>
         <source>&amp;Multiple Distance Buffer</source>
         <translation>Fleiravstandsbuffer</translation>
     </message>
@@ -21,54 +21,69 @@
 <context>
     <name>MultiDistanceBufferDialog</name>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="46"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
         <source>MultiDistanceBuffer</source>
         <translation>FlerAvstandsBuffer</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="47"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="49"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="48"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="51"/>
         <source>Close</source>
         <translation>Lukk</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="53"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="158"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="195"/>
         <source>MultiDistanceBuffer finished</source>
         <translation>FlerAvstandsBuffer ferdig</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="179"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="226"/>
         <source>Aborted</source>
         <translation>Avbrutt</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="181"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="228"/>
         <source>No layer created</source>
         <translation>Laget blei ikke oppretta</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="151"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="187"/>
         <source>Unable to delete temporary files...</source>
         <translation>Klarer ikkje å slette førebelse filer...</translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="191"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="237"/>
         <source>Worker failed - exception: </source>
         <translation>Arbeidsprosessen feila - avbrot: </translation>
     </message>
     <message>
-        <location filename="MultiDistanceBuffer_gui.py" line="197"/>
+        <location filename="MultiDistanceBuffer_gui.py" line="243"/>
         <source>Worker: </source>
         <translation>Arbeidsprosess: </translation>
+    </message>
+    <message>
+        <location filename="MultiDistanceBuffer_gui.py" line="50"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MultiDistanceBuffer_gui.py" line="108"/>
+        <source>The layer has no selected features!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MultiDistanceBuffer_gui.py" line="302"/>
+        <source>Buffer radius 0 is only accepted for polygons</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -89,47 +104,152 @@
         <translation>Bufferavstandar</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="60"/>
-        <source>Buffer distance</source>
-        <translation>Bufferavstand</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="80"/>
+        <location filename="ui_multidistancebuffer.ui" line="274"/>
         <source>Add</source>
         <translation>Legg til</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="122"/>
+        <location filename="ui_multidistancebuffer.ui" line="125"/>
         <source>To remove: select by clicking, then press the Remove-button.&lt;br&gt;To add: Enter the distance above and press Enter or the Add-button.</source>
         <translation>For å fjerne: velg ved å klikke, trykk så på Fjern-knappen.&lt;br&gt;For å legge til: Skriv inn avstanden ovenfor og trykk Enter eller Legg til-knappen.</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="135"/>
+        <location filename="ui_multidistancebuffer.ui" line="156"/>
         <source>Remove</source>
         <translation>Fjern</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="156"/>
+        <location filename="ui_multidistancebuffer.ui" line="302"/>
         <source>Use only selected features</source>
         <translation>Benytt bare valgte objekt</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="163"/>
+        <location filename="ui_multidistancebuffer.ui" line="309"/>
         <source>Output (buffer) layer</source>
         <translation>Ut-laget (buffer)</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="60"/>
+        <source>Buffer distance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="80"/>
+        <source>Add the distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="153"/>
+        <source>Remove the selected entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="163"/>
+        <source>Remove all entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="166"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="190"/>
+        <source>Add multiple zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="199"/>
+        <source>Number:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="206"/>
+        <source>Number of zones to add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="222"/>
+        <source>Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="229"/>
+        <source>The width of each zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="248"/>
+        <source>Start:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="255"/>
+        <source>The start value (innermost buffer distance)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="271"/>
+        <source>Add the zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="315"/>
+        <source>The name of the output layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="334"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="351"/>
+        <source>Standard means 5 segments per quarter circle and dataset buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="354"/>
+        <source>Not available in QGIS 3 yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="357"/>
+        <source>Standard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="377"/>
+        <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="380"/>
+        <source>Segments to approximate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="423"/>
+        <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="426"/>
+        <source>Maximum deviation (map units):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="489"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Worker</name>
     <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="122"/>
+        <location filename="MultiDistanceBuffer_engine.py" line="143"/>
         <source>Doing buffer distance </source>
         <translation>Utfører bufferavstand </translation>
-    </message>
-    <message>
-        <location filename="MultiDistanceBuffer_engine.py" line="190"/>
-        <source>Delivering the layer...</source>
-        <translation>Sender over laget...</translation>
     </message>
 </context>
 </TS>

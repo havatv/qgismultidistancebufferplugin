@@ -266,10 +266,10 @@ class Worker(QtCore.QObject):
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
-            self.progress = None
-            self.status = None
-            self.error = None
-            self.finished = None
+            #self.progress = None
+            #self.status = None
+            #self.error = None
+            #self.finished = None
         else:
             if self.abort is True:
                 self.finished.emit(False, None)
@@ -279,10 +279,10 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
-            self.progress = None
-            self.status = None
-            self.error = None
-            self.finished = None
+            #self.progress = None
+            #self.status = None
+            #self.error = None
+            #self.finished = None
     # end of run
 
     def calculate_progress(self):
