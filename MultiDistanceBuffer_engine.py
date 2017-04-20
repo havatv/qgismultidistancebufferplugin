@@ -248,13 +248,13 @@ class Worker(QtCore.QObject):
             layercopy = None
             for outbufflayer in bufferlayers:
                 outbufflayer = None
-            outbufflayers = None
+            bufferlayers = None
         except:
             # Remove references
             layercopy = None
             for outbufflayer in bufferlayers:
                 outbufflayer = None
-            outbufflayers = None
+            bufferlayers = None
             import traceback
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)

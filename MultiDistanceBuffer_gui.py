@@ -289,6 +289,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of reject
 
     def addDistance(self, buffdist):
+        # Event handler - add (distance) button pressed
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
         thelayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
