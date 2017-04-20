@@ -139,6 +139,42 @@
         <translation>Valg</translation>
     </message>
     <message>
+        <location filename="ui_multidistancebuffer.ui" line="351"/>
+        <source>Standard means 5 segments per quarter circle and dataset buffering</source>
+        <translation>Standard betyr fem segment per kvartsirkel og datasettbuffring</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="354"/>
+        <source>Not available in QGIS 3 yet</source>
+        <translation>Ikke tilgjengelig i QGIS 3 ennå</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="357"/>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="377"/>
+        <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
+        <translation>Antall segment per kvartsirkel&lt;br&gt;(flere segment betyr lengre prosesseringstid</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="380"/>
+        <source>Segments to approximate:</source>
+        <translation>Segment per kvartsirkel</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="423"/>
+        <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
+        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segment per kvartsirkel tilpasses slik at avvikskravene tilfredsstilles (flere segme
+nt for større bufferavstander</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="426"/>
+        <source>Maximum deviation (map units):</source>
+        <translation>Maksimalt avvik (kartenheter)</translation>
+    </message>
+   <message>
         <location filename="ui_multidistancebuffer.ui" line="60"/>
         <source>Buffer distance:</source>
         <translation>Bufferavstand</translation>
@@ -207,43 +243,6 @@
         <location filename="ui_multidistancebuffer.ui" line="315"/>
         <source>The name of the output layer</source>
         <translation>Navnet til ut-laget</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="351"/>
-        <source>Standard means 5 segments per quarter circle and dataset buffering</source>
-        <translation>Standard betyr fem segment per kvartsirkel og datasettbuffring</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="354"/>
-        <source>Not available in QGIS 3 yet</source>
-        <translation>Ikke tilgjengelig i QGIS 3 ennå</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="357"/>
-        <source>Standard</source>
-        <translation>Standard</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="377"/>
-        <source>The number of segments per quarter circle&lt;br&gt;(more segments means longer processing time)</source>
-        <translation>Antall segment per kvartsirkel&lt;br&gt;(flere segment betyr lengre prosesseringstid</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="380"/>
-        <source>Segments to approximate:</source>
-        <translation>Segment per kvartsirkel</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="423"/>
-        <source>The maximum deviation allowed for the buffer distance.&lt;br&gt; The number of segments per quarter circle is adapted to meet the deviation requirement (more segments for larger buffer distances)</source>
-        <translation>Maksimalt avvik for bufferavstanden.&lt;br&gt; Antall segm
-ent per kvartsirkel tilpasses slik at avvikskravene tilfredsstilles (flere segme
-nt for større bufferavstander</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="426"/>
-        <source>Maximum deviation (map units):</source>
-        <translation>Maksimalt avvik (kartenheter)</translation>
     </message>
 </context>
 <context>
