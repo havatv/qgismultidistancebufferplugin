@@ -249,6 +249,9 @@ class Worker(QtCore.QObject):
             for outbufflayer in bufferlayers:
                 outbufflayer = None
             bufferlayers = None
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
         except:
             # Remove references
             layercopy = None
@@ -258,6 +261,9 @@ class Worker(QtCore.QObject):
             import traceback
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
         else:
             if self.abort is True:
                 self.finished.emit(False, None)
