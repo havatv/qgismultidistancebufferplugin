@@ -63,7 +63,7 @@ class Worker(QtCore.QObject):
                                 deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
         deviation --            maximum deviation (apply if > 0.0 and
-                                segments > 0).
+                                not segments > 0).
         """
 
         QtCore.QObject.__init__(self)  # Essential!
@@ -72,7 +72,7 @@ class Worker(QtCore.QObject):
         self.inputpath = inputvectorlayerpath
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
-        self.selectedonly = selectedonly
+        #self.selectedonly = selectedonly
         self.tempfilepath = tempfilepath
         # Creating instance variables for the progress bar ++
         # Number of elements that have been processed - updated by
