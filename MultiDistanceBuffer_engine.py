@@ -219,7 +219,7 @@ class Worker(QtCore.QObject):
                             continue
                     # Set the buffer distance attribute to the current distance
                     for feature in bufflayer.getFeatures():
-                        attrs = {0: dist}  # Set the first attribute value
+                        attrs = {0: dist, 1: prevdist}  # Set attribute values
                         bufflayer.dataProvider().changeAttributeValues(
                                            {feature.id(): attrs})
                     bufferlayers.append(bufflayer)
