@@ -23,9 +23,10 @@ and a set of distances.
 The resulting dataset consists of one (multi)polygon ("donut type")
 for each buffer distance.
 The (multi)polygons do not overlap.
-The attribute table of the result dataset will have one column /
-field named *distance*, that contains the (maximum) distance for the
-(multi)polygon.
+The attribute table of the result dataset will have two columns /
+fields named *distance* and *inner*, that contain the outer (maximum)
+distance and the inner distance for each (multi)polygon.
+For the innermost zone, the value of *inner* is not set.
 The memory layer containing the dataset is added to the QGIS table
 of contents.
 
