@@ -91,6 +91,8 @@ class Worker(QtCore.QObject):
         self.abort = False
         # Distance attribute name
         self.distAttrName = 'distance'
+        # Inner distance attribute name
+        self.innerAttrName = 'inner'
         # Directories and files
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         # Options
@@ -111,10 +113,11 @@ class Worker(QtCore.QObject):
             # Remove all the existing attributes:
             while pr.deleteAttributes([0]):
                 continue
-            # Add the distance attribute
+            # Add the distance attributes
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
+            pr.addAttributes([QgsField(self.innerAttrName, QVariant.Double)])
             layercopy.updateFields()  # Commit the attribute changes
-            # Create the memory layer for the results (have to specify a
+             # Create the memory layer for the results (have to specify a
             # CRS in order to avoid the select CRS dialogue)
             memresult = QgsVectorLayer('Polygon?crs=EPSG:4326',
                                        self.outputlayername, "memory")
@@ -136,6 +139,7 @@ class Worker(QtCore.QObject):
 
             # Do the buffering (order: smallest to largest distances):
             j = 0
+            prevdist = None
             for dist in self.buffersizes:
                 if self.abort is True:
                     break
@@ -187,7 +191,7 @@ class Worker(QtCore.QObject):
                         newgeom = outergeom.symDifference(innergeom)
                     newfeature = QgsFeature()
                     newfeature.setGeometry(newgeom)
-                    newfeature.setAttributes([dist])
+                    newfeature.setAttributes([dist, prevdist])
                     memresult.dataProvider().addFeatures([newfeature])
                 else:
                     # The QgsGeometryAnalyzer().buffer operation can only
@@ -213,7 +217,7 @@ class Worker(QtCore.QObject):
                             continue
                     # Set the buffer distance attribute to the current distance
                     for feature in bufflayer.getFeatures():
-                        attrs = {0: dist}  # Set the first attribute value
+                        attrs = {0: dist, 1: prevdist}  # Set attribute values
                         bufflayer.dataProvider().changeAttributeValues(
                                            {feature.id(): attrs})
                     bufferlayers.append(bufflayer)
@@ -238,6 +242,7 @@ class Worker(QtCore.QObject):
                     # Report progress
                     self.calculate_progress()
                 j = j + 1
+                prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
             #  + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
 
