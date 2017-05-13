@@ -1,9 +1,13 @@
 MultiDistanceBuffer
 ===================
-QGIS Plugin for Multi-distance buffering
+QGIS Plugin for multi-distance / multi-ring / multi-zone buffering.
 
-The Current version uses QgsGeometryAnalyzer.buffer and
+The *Standard* alternative uses QgsGeometryAnalyzer.buffer and
 QgsGeometry.symDifference to create the buffer bands.
+
+The other alternatives (*Segments to approximate* and *Maximum
+deviation*) avoid QgsGeometryAnalyzer by using QgsGeometry.buffer,
+QgsGeometry.combine and QgsGeometry.symDifference.
 
 The plugin is available from the QGIS official plugin repository
 (http://plugins.qgis.org).
