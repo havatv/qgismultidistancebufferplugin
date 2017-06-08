@@ -135,11 +135,14 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             segments = self.segmentsSB.value()
         if self.deviationRB.isChecked():
             deviation = self.deviationSB.value()
+        if self.standardRB.isChecked():
+            # Standard means segments to approximate with 5 segments
+            segments = 5
 
         #self.showInfo('Starting worker: ' + str(bufferdistances))
         worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
-                      self.tempfilepathprefix, segments, deviation)
+                      segments, deviation)
         thread = QThread(self)
         worker.progress.connect(self.progressBar.setValue)
         worker.status.connect(self.workerInfo)
@@ -176,14 +179,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # avoid this, a new memory layer is created and features are
         # copied there"""
 
-        # Remove temporary files
-        try:
-            copypattern = self.tempfilepathprefix + '*'
-            tmpfiles = glob.glob(copypattern)
-            for tmpfile in tmpfiles:
-                os.remove(tmpfile)
-        except:
-            self.showInfo(self.tr('Unable to delete temporary files...'))
         if ok and ret is not None:
             # get the name of the outputlayer
             outputlayername = self.outputLayerName.text()
@@ -191,7 +186,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             result_layer = ret
             #result_layer.setName(outputlayername) # 2.14
             #result_layer.setLayerName(outputlayername) # from QGIS 2.16
-            self.showInfo(self.tr('MultiDistanceBuffer finished'))
+            self.showInfo(self.tr('MultiDistanceBuffer completed'))
             #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
@@ -276,14 +271,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def reject(self):
         """Reject override."""
         # exits the dialog
-        # Removes all temporary files
-        try:
-            copypattern = self.tempfilepathprefix + '*'
-            tmpfiles = glob.glob(copypattern)
-            for tmpfile in tmpfiles:
-                os.remove(tmpfile)
-        except:
-            self.showInfo('Unable to delete temporary files...')
         self.listModel.clear()
         QDialog.reject(self)
     # end of reject

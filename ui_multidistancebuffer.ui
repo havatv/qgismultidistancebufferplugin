@@ -354,7 +354,7 @@
          <item>
           <widget class="QRadioButton" name="standardRB">
            <property name="toolTip">
-            <string>Standard means 5 segments per quarter circle and dataset buffering</string>
+            <string>Standard means 5 segments per quarter circle</string>
            </property>
            <property name="text">
             <string>Standard</string>

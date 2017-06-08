@@ -117,17 +117,12 @@ Three approaches to buffering are offered by the plugin
 Implementation
 ==================
 
-With the *standard* approach, buffers for all the distances are
-created using the *buffer* function of *QgsGeometryAnalyzer*.
-The *buffer* function of *QgsGeometryAnalyzer* does not support
-the specification of buffer accuracy (segments / arc vertex distance
-/ maximum deviation), so the default of 5 segments has to be used.
-
-The *buffer* function of *QgsGeometryAnalyzer* does not
-support memory layers as output, so a temporary (using the Python
-*tempfile* module) *Shapefile format* dataset is created for each
-buffer distance.
-The temporary datasets are later deleted.
+The *standard* approach used to use the *buffer* function of
+*QgsGeometryAnalyzer* that does not support the specification of
+buffer accuracy (segments / arc vertex distance / maximum deviation),
+defaulting to 5 segments.
+In the current implementation it is a special case of "Segments to
+approximate", using 5 segments for the approximation.
 
 For the other two approaches (added in verion 2.0), the *buffer*
 function of *QgsGeometry* is used, and the resulting buffer
@@ -135,8 +130,18 @@ geometries are combined using the *dissolve* function of
 *QgsGeometry*.
 
 The buffers are combined to form the result multi-distance buffer
-dataset using the *symDifference* function of *QgsGeometry* for
-all the approaches.
+dataset using the *symDifference* function of *QgsGeometry*.
+
+Citation
+===========
+
+Would you like to cite this plugin?
+
+Tveite, Håvard.  2017.  The QGIS Multi-distance buffer Plugin, Version
+2.2.1.
+http://plugins.qgis.org/plugins/MultiDistanceBuffer/
+
+
 
 Links
 =======

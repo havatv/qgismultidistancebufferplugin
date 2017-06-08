@@ -45,7 +45,7 @@ class Worker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, object)
 
     def __init__(self, inputvectorlayer, inputvectorlayerpath, buffersizes,
-                               outputlayername, selectedonly, tempfilepath,
+                               outputlayername, selectedonly,
                                segments, deviation):
         """Initialise.
 
@@ -58,9 +58,6 @@ class Worker(QtCore.QObject):
         outputlayername --      Name of the output vector layer.
         selectedonly --         (boolean) Should only selected
                                 features be buffered.  NOT USED!
-        tempfilepath --         path to be used for temporary files
-                                (all files with this prefix will be
-                                deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
         deviation --            maximum deviation (apply if > 0.0 and
                                 not segments > 0).
@@ -73,7 +70,6 @@ class Worker(QtCore.QObject):
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
         #self.selectedonly = selectedonly
-        self.tempfilepath = tempfilepath
         # Creating instance variables for the progress bar ++
         # Number of elements that have been processed - updated by
         # calculate_progress
@@ -93,8 +89,6 @@ class Worker(QtCore.QObject):
         self.distAttrName = 'distance'
         # Inner distance attribute name
         self.innerAttrName = 'inner'
-        # Directories and files
-        self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         # Options
         self.segments = segments
         self.deviation = deviation
@@ -102,7 +96,6 @@ class Worker(QtCore.QObject):
 
     # Should @pyqtSlot be used here?
     def run(self):
-        bufferlayers = []
         try:
             layercopy = self.inpvl
             self.inpvl = None  # Remove the reference to the layer
@@ -117,7 +110,7 @@ class Worker(QtCore.QObject):
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
             pr.addAttributes([QgsField(self.innerAttrName, QVariant.Double)])
             layercopy.updateFields()  # Commit the attribute changes
-             # Create the memory layer for the results (have to specify a
+            # Create the memory layer for the results (have to specify a
             # CRS in order to avoid the select CRS dialogue)
             memresult = QgsVectorLayer('Polygon?crs=EPSG:4326',
                                        self.outputlayername, "memory")
@@ -147,100 +140,49 @@ class Worker(QtCore.QObject):
                          str(dist) + '... '
                          #+str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
                          )
-                outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
 
                 # Determine which buffer variant to use
-                if (self.segments > 0 or self.deviation > 0.0):
-                    if (self.segments > 0):
-                        segments = self.segments
-                        #self.status.emit("Segments")
-                    else:
-                        tolerance = self.deviation
-                        # Calculate the number of segments per quarter circle
-                        segments = 5
-                        if dist != 0.0:
-                            segments = int(math.pi / (4.0 * math.acos(1.0 -
-                                       (tolerance / float(abs(dist)))))) + 1
-                    segments = max(segments, 1)
-                    multigeom = QgsGeometry()
-                    # Go through the features and buffer and combine the
-                    # feature geometries
-                    i = 0
-                    for feat in layercopy.getFeatures():
-                        bgeom = feat.geometry().buffer(dist, segments)
-                        if i == 0:
-                            multigeom = bgeom
-                        else:
-                            multigeom = multigeom.combine(bgeom)
-                        i = i + 1
-                        self.calculate_progress()
-                        #QCoreApplication.processEvents() # does not help
-                        if self.abort is True:
-                            break
-                    buffergeomvector.append(multigeom)
-
-                    # Compute the donut and add it to the result dataset
-                    newgeom = None
-                    if j == 0:     # Just add the innermost buffer
-                        newgeom = buffergeomvector[j]
-                    else:
-                        # Get the donut by subtracting the inner ring
-                        # from this ring
-                        outergeom = buffergeomvector[j]
-                        innergeom = buffergeomvector[j - 1]
-                        newgeom = outergeom.symDifference(innergeom)
-                    newfeature = QgsFeature()
-                    newfeature.setGeometry(newgeom)
-                    newfeature.setAttributes([dist, prevdist])
-                    memresult.dataProvider().addFeatures([newfeature])
+                if (self.segments > 0):
+                    segments = self.segments
+                    #self.status.emit("Segments")
                 else:
-                    # The QgsGeometryAnalyzer().buffer operation can only
-                    # produce a Shapefile format dataset)
-                    # parameters: layer, path to output data set,
-                    # distance, selected only, dissolve, attribute index
-                    ok = QgsGeometryAnalyzer().buffer(layercopy,
-                                    outbuffername, dist, False, True, -1)
-                    if not ok:
-                        self.status.emit('The buffer operation failed!')
-                    blayername = 'buff' + str(dist)
-                    # Load the buffer data set
-                    bufflayer = QgsVectorLayer(outbuffername, blayername,
-                                               "ogr")
-                    # Check if the buffer data set is empty
-                    if bufflayer.featureCount() == 0:
-                        continue
-                    if bufflayer.featureCount() == 1:
-                        thefeature = None
-                        for f in bufflayer.getFeatures():
-                            thefeature = f
-                        if (not thefeature) or (thefeature.geometry() is None):
-                            continue
-                    # Set the buffer distance attribute to the current distance
-                    for feature in bufflayer.getFeatures():
-                        attrs = {0: dist, 1: prevdist}  # Set attribute values
-                        bufflayer.dataProvider().changeAttributeValues(
-                                           {feature.id(): attrs})
-                    bufferlayers.append(bufflayer)
-                    bufflayer = None
-                    # Calculate the current distance band
-                    if j == 0:     # The innermost buffer, just add it
-                        for midfeature in bufferlayers[j].getFeatures():
-                            memresult.dataProvider().addFeatures([midfeature])
+                    tolerance = self.deviation
+                    # Calculate the number of segments per quarter circle
+                    segments = 5
+                    if dist != 0.0:
+                        segments = int(math.pi / (4.0 * math.acos(1.0 -
+                                   (tolerance / float(abs(dist)))))) + 1
+                segments = max(segments, 1)
+                multigeom = QgsGeometry()
+                # Go through the features and buffer and combine the
+                # feature geometries
+                i = 0
+                for feat in layercopy.getFeatures():
+                    bgeom = feat.geometry().buffer(dist, segments)
+                    if i == 0:
+                        multigeom = bgeom
                     else:
-                        for outerfeature in bufferlayers[j].getFeatures():
-                            # Get the donut by subtracting the inner ring
-                            # from this ring
-                            outergeom = outerfeature.geometry()
-                            for innerfeature in bufferlayers[j - 1].getFeatures():
-                                innergeom = innerfeature.geometry()
-                                newgeom = outergeom.symDifference(innergeom)
-                                outergeom = newgeom
-                            newfeature = QgsFeature()
-                            newfeature.setGeometry(outergeom)
-                            newfeature.setAttributes(outerfeature.attributes())
-                            memresult.dataProvider().addFeatures([newfeature])
-                    # Report progress
+                        multigeom = multigeom.combine(bgeom)
+                    i = i + 1
                     self.calculate_progress()
+                    if self.abort is True:
+                        break
+                buffergeomvector.append(multigeom)
+
+                # Compute the donut and add it to the result dataset
+                newgeom = None
+                if j == 0:     # Just add the innermost buffer
+                    newgeom = buffergeomvector[j]
+                else:
+                    # Get the donut by subtracting the inner ring
+                    # from this ring
+                    outergeom = buffergeomvector[j]
+                    innergeom = buffergeomvector[j - 1]
+                    newgeom = outergeom.symDifference(innergeom)
+                newfeature = QgsFeature()
+                newfeature.setGeometry(newgeom)
+                newfeature.setAttributes([dist, prevdist])
+                memresult.dataProvider().addFeatures([newfeature])
                 j = j + 1
                 prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
@@ -251,18 +193,12 @@ class Worker(QtCore.QObject):
             memresult.reload()
             # Remove references
             layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            bufferlayers = None
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
         except:
             # Remove references
             layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            bufferlayers = None
             import traceback
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)
