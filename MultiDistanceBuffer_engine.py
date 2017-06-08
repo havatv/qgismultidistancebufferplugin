@@ -114,7 +114,7 @@ class Worker(QtCore.QObject):
             # Remove all the existing attributes:
             while pr.deleteAttributes([0]):
                 continue
-            # Add the distance attribute
+            # Add the distance attributes
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
             pr.addAttributes([QgsField(self.innerAttrName, QVariant.Double)])
             layercopy.updateFields()  # Commit the attribute changes
