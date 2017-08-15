@@ -94,29 +94,24 @@
         <translation>Innlag</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="45"/>
+        <location filename="ui_multidistancebuffer.ui" line="61"/>
         <source>Buffer distances</source>
         <translation>Bufferavstander</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="283"/>
+        <location filename="ui_multidistancebuffer.ui" line="299"/>
         <source>Add</source>
         <translation>Legg til</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="134"/>
+        <location filename="ui_multidistancebuffer.ui" line="150"/>
         <source>To remove: select by clicking, then press the Remove-button.&lt;br&gt;To add: Enter the distance above and press Enter or the Add-button.</source>
         <translation>For å fjerne: velg ved å klikke, trykk så på Fjern-knappen.&lt;br&gt;For å legge til: Skriv inn avstanden ovenfor og trykk Enter eller Legg til-knappen.</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="165"/>
+        <location filename="ui_multidistancebuffer.ui" line="181"/>
         <source>Remove</source>
         <translation>Fjern</translation>
-    </message>
-    <message>
-        <location filename="ui_multidistancebuffer.ui" line="311"/>
-        <source>Use only selected features</source>
-        <translation>Benytt bare valgte objekter</translation>
     </message>
     <message>
         <location filename="ui_multidistancebuffer.ui" line="318"/>
@@ -159,67 +154,67 @@
         <translation>Maksimalt avvik (kartenheter)</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="66"/>
+        <location filename="ui_multidistancebuffer.ui" line="82"/>
         <source>Buffer distance:</source>
         <translation>Bufferavstand</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="86"/>
+        <location filename="ui_multidistancebuffer.ui" line="102"/>
         <source>Add the distance</source>
         <translation>Legg til avstanden</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="162"/>
+        <location filename="ui_multidistancebuffer.ui" line="178"/>
         <source>Remove the selected entries</source>
         <translation>Fjern de valgte avstandene</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="172"/>
+        <location filename="ui_multidistancebuffer.ui" line="188"/>
         <source>Remove all entries</source>
         <translation>Fjern alle avstandene</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="175"/>
+        <location filename="ui_multidistancebuffer.ui" line="191"/>
         <source>Clear</source>
         <translation>Fjern alle</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="199"/>
+        <location filename="ui_multidistancebuffer.ui" line="215"/>
         <source>Add multiple zones</source>
         <translation>Legg til flere soner</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="208"/>
+        <location filename="ui_multidistancebuffer.ui" line="224"/>
         <source>Number:</source>
         <translation>Antall:</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="215"/>
+        <location filename="ui_multidistancebuffer.ui" line="231"/>
         <source>Number of zones to add</source>
         <translation>Antall soner som skal legges til</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="231"/>
+        <location filename="ui_multidistancebuffer.ui" line="247"/>
         <source>Width:</source>
         <translation>Bredde:</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="238"/>
+        <location filename="ui_multidistancebuffer.ui" line="254"/>
         <source>The width of each zone</source>
         <translation>Bredda til hver sone</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="257"/>
+        <location filename="ui_multidistancebuffer.ui" line="273"/>
         <source>Start:</source>
         <translation>Start:</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="264"/>
+        <location filename="ui_multidistancebuffer.ui" line="280"/>
         <source>The start value (innermost buffer distance)</source>
         <translation>Startverdien (den innerste bufferavstanden)</translation>
     </message>
     <message>
-        <location filename="ui_multidistancebuffer.ui" line="280"/>
+        <location filename="ui_multidistancebuffer.ui" line="296"/>
         <source>Add the zones</source>
         <translation>Legg til sonene</translation>
     </message>
@@ -232,6 +227,11 @@
         <location filename="ui_multidistancebuffer.ui" line="357"/>
         <source>Standard means 5 segments per quarter circle</source>
         <translation>Standard betyr fem segment per kvartsirkel</translation>
+    </message>
+    <message>
+        <location filename="ui_multidistancebuffer.ui" line="51"/>
+        <source>Selected features only</source>
+        <translation>Benytt bare valgte objekt</translation>
     </message>
 </context>
 <context>
