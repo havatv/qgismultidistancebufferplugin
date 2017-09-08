@@ -24,7 +24,7 @@
 import math  # for beregning av segments to approximate
 from qgis.core import QgsVectorLayer, QgsFeature
 from qgis.core import QgsField, QgsGeometry
-from qgis.analysis import QgsGeometryAnalyzer
+#from qgis.analysis import QgsGeometryAnalyzer
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 
@@ -195,54 +195,55 @@ class Worker(QtCore.QObject):
                     newfeature.setAttributes([dist, prevdist])
                     memresult.dataProvider().addFeatures([newfeature])
                 else:
-                    # With QGIS3, QgsGeometryAnalyzer causes problems
-                    # The QgsGeometryAnalyzer().buffer operation can only
-                    # produce a Shapefile format dataset)
-                    # parameters: layer, path to output data set,
-                    # distance, selected only, dissolve, attribute index
-                    ok = QgsGeometryAnalyzer().buffer(layercopy,
-                                    outbuffername, dist, False, True, -1)
-                    if not ok:
-                        self.status.emit('The buffer operation failed!')
-                    blayername = 'buff' + str(dist)
-                    # Load the buffer data set
-                    bufflayer = QgsVectorLayer(outbuffername, blayername,
-                                               "ogr")
-                    # Check if the buffer data set is empty
-                    if bufflayer.featureCount() == 0:
-                        continue
-                    if bufflayer.featureCount() == 1:
-                        thefeature = None
-                        for f in bufflayer.getFeatures():
-                            thefeature = f
-                        if (not thefeature) or (thefeature.geometry() is None):
-                            continue
-                    # Set the buffer distance attribute to the current distance
-                    for feature in bufflayer.getFeatures():
-                        attrs = {0: dist, 1: prevdist}  # Set attribute values
-                        bufflayer.dataProvider().changeAttributeValues(
-                                           {feature.id(): attrs})
-                    bufferlayers.append(bufflayer)
-                    bufflayer = None
-                    # Calculate the current distance band
-                    if j == 0:     # The innermost buffer, just add it
-                        for midfeature in bufferlayers[j].getFeatures():
-                            memresult.dataProvider().addFeatures([midfeature])
-                    else:
-                        for outerfeature in bufferlayers[j].getFeatures():
-                            # Get the donut by subtracting the inner ring
-                            # from this ring
-                            outergeom = outerfeature.geometry()
-                            for innerfeature in bufferlayers[j - 1].getFeatures():
-                                innergeom = innerfeature.geometry()
-                                newgeom = outergeom.symDifference(innergeom)
-                                outergeom = newgeom
-                            newfeature = QgsFeature()
-                            newfeature.setGeometry(outergeom)
-                            newfeature.setAttributes(outerfeature.attributes())
-                            memresult.dataProvider().addFeatures([newfeature])
-                    # Report progress
-                    self.calculate_progress()
+                    ## With QGIS3, QgsGeometryAnalyzer causes problems
+                    ## The QgsGeometryAnalyzer().buffer operation can only
+                    ## produce a Shapefile format dataset)
+                    ## parameters: layer, path to output data set,
+                    ## distance, selected only, dissolve, attribute index
+                    self.status.emit('The buffer variant is not supported!')
+                    #ok = QgsGeometryAnalyzer().buffer(layercopy,
+                    #                outbuffername, dist, False, True, -1)
+                    #if not ok:
+                    #    self.status.emit('The buffer operation failed!')
+                    #blayername = 'buff' + str(dist)
+                    ## Load the buffer data set
+                    #bufflayer = QgsVectorLayer(outbuffername, blayername,
+                    #                           "ogr")
+                    ## Check if the buffer data set is empty
+                    #if bufflayer.featureCount() == 0:
+                    #    continue
+                    #if bufflayer.featureCount() == 1:
+                    #    thefeature = None
+                    #    for f in bufflayer.getFeatures():
+                    #        thefeature = f
+                    #    if (not thefeature) or (thefeature.geometry() is None):
+                    #        continue
+                    ## Set the buffer distance attribute to the current distance
+                    #for feature in bufflayer.getFeatures():
+                    #    attrs = {0: dist, 1: prevdist}  # Set attribute values
+                    #    bufflayer.dataProvider().changeAttributeValues(
+                    #                       {feature.id(): attrs})
+                    #bufferlayers.append(bufflayer)
+                    #bufflayer = None
+                    ## Calculate the current distance band
+                    #if j == 0:     # The innermost buffer, just add it
+                    #    for midfeature in bufferlayers[j].getFeatures():
+                    #        memresult.dataProvider().addFeatures([midfeature])
+                    #else:
+                    #    for outerfeature in bufferlayers[j].getFeatures():
+                    #        # Get the donut by subtracting the inner ring
+                    #        # from this ring
+                    #        outergeom = outerfeature.geometry()
+                    #        for innerfeature in bufferlayers[j - 1].getFeatures():
+                    #            innergeom = innerfeature.geometry()
+                    #            newgeom = outergeom.symDifference(innergeom)
+                    #            outergeom = newgeom
+                    #        newfeature = QgsFeature()
+                    #        newfeature.setGeometry(outergeom)
+                    #        newfeature.setAttributes(outerfeature.attributes())
+                    #        memresult.dataProvider().addFeatures([newfeature])
+                    ## Report progress
+                    #self.calculate_progress()
                 j = j + 1
                 prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
