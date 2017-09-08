@@ -63,7 +63,7 @@ class Worker(QtCore.QObject):
                                 deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
         deviation --            maximum deviation (apply if > 0.0 and
-                                segments > 0).
+                                not segments > 0).
         """
 
         QtCore.QObject.__init__(self)  # Essential!
@@ -72,7 +72,7 @@ class Worker(QtCore.QObject):
         self.inputpath = inputvectorlayerpath
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
-        self.selectedonly = selectedonly
+        #self.selectedonly = selectedonly
         self.tempfilepath = tempfilepath
         # Creating instance variables for the progress bar ++
         # Number of elements that have been processed - updated by
@@ -91,6 +91,8 @@ class Worker(QtCore.QObject):
         self.abort = False
         # Distance attribute name
         self.distAttrName = 'distance'
+        # Inner distance attribute name
+        self.innerAttrName = 'inner'
         # Directories and files
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         # Inner distance attribute name
@@ -220,8 +222,7 @@ class Worker(QtCore.QObject):
                     #        continue
                     ## Set the buffer distance attribute to the current distance
                     #for feature in bufflayer.getFeatures():
-                    #    attrs = {0: dist}  # Set the first attribute value
-                    #    #attrs = {0: dist,1: prevdist}  # Set the attributes
+                    #    attrs = {0: dist, 1: prevdist}  # Set attribute values
                     #    bufflayer.dataProvider().changeAttributeValues(
                     #                       {feature.id(): attrs})
                     #bufferlayers.append(bufflayer)
@@ -229,7 +230,7 @@ class Worker(QtCore.QObject):
                     ## Calculate the current distance band
                     #if j == 0:     # The innermost buffer, just add it
                     #    for midfeature in bufferlayers[j].getFeatures():
-                    #       memresult.dataProvider().addFeatures([midfeature])
+                    #        memresult.dataProvider().addFeatures([midfeature])
                     #else:
                     #    for outerfeature in bufferlayers[j].getFeatures():
                     #        # Get the donut by subtracting the inner ring
@@ -245,6 +246,7 @@ class Worker(QtCore.QObject):
                     #        memresult.dataProvider().addFeatures([newfeature])
                     ## Report progress
                     #self.calculate_progress()
+                    #self.calculate_progress()
                 j = j + 1
                 prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
@@ -253,25 +255,30 @@ class Worker(QtCore.QObject):
             # Update the layer extents (after adding features)
             memresult.updateExtents()
             memresult.reload()
-
-            layercopy = None
-        except:
-            import traceback
-            self.error.emit(traceback.format_exc())
-            self.finished.emit(False, None)
             # Remove references
             layercopy = None
             for outbufflayer in bufferlayers:
                 outbufflayer = None
-            outbufflayers = None
+            bufferlayers = None
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
-
-            self.progress = None
-            self.status = None
-            self.error = None
-            self.finished = None
+        except:
+            # Remove references
+            layercopy = None
+            for outbufflayer in bufferlayers:
+                outbufflayer = None
+            bufferlayers = None
+            import traceback
+            self.error.emit(traceback.format_exc())
+            self.finished.emit(False, None)
+            for buffgeom in buffergeomvector:
+                buffgeom = None
+            buffergeomvector = None
+            #self.progress = None
+            #self.status = None
+            #self.error = None
+            #self.finished = None
         else:
             if self.abort is True:
                 self.finished.emit(False, None)
@@ -281,18 +288,10 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
-            # Remove references
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            outbufflayers = None
-            for buffgeom in buffergeomvector:
-                buffgeom = None
-            buffergeomvector = None
-
-            self.progress = None
-            self.status = None
-            self.error = None
-            self.finished = None
+            #self.progress = None
+            #self.status = None
+            #self.error = None
+            #self.finished = None
     # end of run
 
     def calculate_progress(self):

@@ -23,18 +23,20 @@ and a set of distances.
 The resulting dataset consists of one (multi)polygon ("donut type")
 for each buffer distance.
 The (multi)polygons do not overlap.
-The attribute table of the result dataset will have one column /
-field named *distance*, that contains the (maximum) distance for the
-(multi)polygon.
+The attribute table of the result dataset will have two columns /
+fields named *distance* and *inner*, that contain the outer (maximum)
+distance and the inner distance for each (multi)polygon.
+For the innermost zone, the value of *inner* is not set.
 The memory layer containing the dataset is added to the QGIS table
 of contents.
 
 If 100 and 200 are provided as distances, the result dataset will
 consist of two zones / bands / (multi)polygons - one will contain
 all areas that are within 100 units from the geometries of the input
-vector layer (including the geometries themselves), the other will
-contain all areas that are from 100 to 200 units from the geometries
-of the input vector layer.
+vector layer (including the geometries themselves) and will have its
+*distance* field set to 100; the other will contain all areas that
+are from 100 to 200 units from the geometries of the input vector
+layer and will have its *distance* field set to 200.
 
 The buffer distances (decimal numbers) can be specified by the user
 in any order.
@@ -44,10 +46,16 @@ Negative and 0.0 buffer distances are allowed for polygon layers.
 Buffering a polygon with a negative buffer distance means shrinking
 the polygon and is also known as a *setback*.
 
-Buffer distances can be added and deleted in the dialogue using the
-*Add* and *Remove* buttons.
-The keyboard can be used to add the buffer distances quickly (number
+Buffer distances can be added and removed in the dialogue using the
+*Add*, *Remove* and *Clear* buttons.
+The *Remove* button removes the selected entries, while the *Clear*
+button removes all entries.
+The keyboard can be used to add buffer distances quickly (number
 followed by <enter>).
+
+Fixed increment buffer distances can be added under **Add multiple
+zones**, specifying the number of zones, the width of each zone and
+the start value.
 
 A checkbox (*Use only selected features*) can be used to choose to
 only buffer around selected features.
@@ -57,18 +65,8 @@ If there is no selection in the chosen layer, the default will be
 set to not only use selected features.
 The user can modify this behaviour with the checkbox.
 
-Three approaches to buffering are offered by the plugin
+Two approaches to buffering are offered by the plugin
 -------------------------------------------------------
-
-*Standard*
-  Will use five segments to represent a quarter circle
-  for the buffer geometries in the result dataset.
-
-  .. image:: illustrations/standard.png
-   :width: 200
-
-  *Note: The "standard" option is currently not available for QGIS 3
-  due to threading issues with QgsGeometryAnalyzer buffer*
 
 *Segments to approximate* (new in version 2.0/3.0)
   The user has to specify the number of segments to use for a quarter
@@ -108,29 +106,44 @@ Three approaches to buffering are offered by the plugin
   | |dev1|           | |dev10|           |
   +------------------+-------------------+
  
+
+*Standard*
+  *Note: The "standard" option has been removed because
+  QgsGeometryAnalyzer was been removed in QGIS 3*
+
+  The *Standard* option used five segments to represent a quarter
+  circle for the buffer geometries in the result dataset.
+
+  .. image:: illustrations/standard.png
+   :width: 200
+
+  The result should be the same as the *Segments to approximate*
+  option with the default (5) number of segments.
+
 Implementation
 ==================
 
-With the *standard* approach, buffers for all the distances are
-created using the *buffer* function of *QgsGeometryAnalyzer*.
-The *buffer* function of *QgsGeometryAnalyzer* does not support
-the specification of buffer accuracy (segments / arc vertex distance
-/ maximum deviation), so the default of 5 segments has to be used.
-
-The *buffer* function of *QgsGeometryAnalyzer* does not
-support memory layers as output, so a temporary (using the Python
-*tempfile* module) *Shapefile format* dataset is created for each
-buffer distance.
-The temporary datasets are later deleted.
-
-For the other two approaches (added in verion 2.0/3.0), the *buffer*
-function of *QgsGeometry* is used, and the resulting buffer
-geometries are combined using the *dissolve* function of
+The *buffer* function of *QgsGeometry* is used, and the resulting
+buffer geometries are combined using the *dissolve* function of
 *QgsGeometry*.
 
 The buffers are combined to form the result multi-distance buffer
 dataset using the *symDifference* function of *QgsGeometry* for
 all the approaches.
+
+With the *standard* approach, buffers for all the distances used
+to be created using the *buffer* function of *QgsGeometryAnalyzer*.
+The *buffer* function of *QgsGeometryAnalyzer* did not support
+the specification of buffer accuracy (segments / arc vertex distance
+/ maximum deviation), so the default of 5 segments had to be used.
+
+The *buffer* function of *QgsGeometryAnalyzer* did not
+support memory layers as output, so a temporary (using the Python
+*tempfile* module) *Shapefile format* dataset was created for each
+buffer distance.
+The temporary datasets were later deleted.
+
+
 
 Links
 =======
