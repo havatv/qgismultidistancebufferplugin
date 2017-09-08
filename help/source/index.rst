@@ -65,18 +65,8 @@ If there is no selection in the chosen layer, the default will be
 set to not only use selected features.
 The user can modify this behaviour with the checkbox.
 
-Three approaches to buffering are offered by the plugin
+Two approaches to buffering are offered by the plugin
 -------------------------------------------------------
-
-*Standard*
-  Will use five segments to represent a quarter circle
-  for the buffer geometries in the result dataset.
-
-  .. image:: illustrations/standard.png
-   :width: 200
-
-  *Note: The "standard" option is currently not available for QGIS 3
-  due to threading issues with QgsGeometryAnalyzer buffer*
 
 *Segments to approximate* (new in version 2.0/3.0)
   The user has to specify the number of segments to use for a quarter
@@ -116,29 +106,44 @@ Three approaches to buffering are offered by the plugin
   | |dev1|           | |dev10|           |
   +------------------+-------------------+
  
+
+*Standard*
+  *Note: The "standard" option has been removed because
+  QgsGeometryAnalyzer was been removed in QGIS 3*
+
+  The *Standard* option used five segments to represent a quarter
+  circle for the buffer geometries in the result dataset.
+
+  .. image:: illustrations/standard.png
+   :width: 200
+
+  The result should be the same as the *Segments to approximate*
+  option with the default (5) number of segments.
+
 Implementation
 ==================
 
-With the *standard* approach, buffers for all the distances are
-created using the *buffer* function of *QgsGeometryAnalyzer*.
-The *buffer* function of *QgsGeometryAnalyzer* does not support
-the specification of buffer accuracy (segments / arc vertex distance
-/ maximum deviation), so the default of 5 segments has to be used.
-
-The *buffer* function of *QgsGeometryAnalyzer* does not
-support memory layers as output, so a temporary (using the Python
-*tempfile* module) *Shapefile format* dataset is created for each
-buffer distance.
-The temporary datasets are later deleted.
-
-For the other two approaches (added in verion 2.0/3.0), the *buffer*
-function of *QgsGeometry* is used, and the resulting buffer
-geometries are combined using the *dissolve* function of
+The *buffer* function of *QgsGeometry* is used, and the resulting
+buffer geometries are combined using the *dissolve* function of
 *QgsGeometry*.
 
 The buffers are combined to form the result multi-distance buffer
 dataset using the *symDifference* function of *QgsGeometry* for
 all the approaches.
+
+With the *standard* approach, buffers for all the distances used
+to be created using the *buffer* function of *QgsGeometryAnalyzer*.
+The *buffer* function of *QgsGeometryAnalyzer* did not support
+the specification of buffer accuracy (segments / arc vertex distance
+/ maximum deviation), so the default of 5 segments had to be used.
+
+The *buffer* function of *QgsGeometryAnalyzer* did not
+support memory layers as output, so a temporary (using the Python
+*tempfile* module) *Shapefile format* dataset was created for each
+buffer distance.
+The temporary datasets were later deleted.
+
+
 
 Links
 =======
