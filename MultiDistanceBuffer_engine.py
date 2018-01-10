@@ -95,8 +95,6 @@ class Worker(QtCore.QObject):
         self.innerAttrName = 'inner'
         # Directories and files
         self.tmpbuffbasename = self.tempfilepath + 'outbuff'
-        # Inner distance attribute name
-        self.innerAttrName = 'inner'
         # Options
         self.segments = segments
         self.deviation = deviation
@@ -245,7 +243,6 @@ class Worker(QtCore.QObject):
                     #        newfeature.setAttributes(outerfeature.attributes())
                     #        memresult.dataProvider().addFeatures([newfeature])
                     ## Report progress
-                    #self.calculate_progress()
                     #self.calculate_progress()
                 j = j + 1
                 prevdist = dist
