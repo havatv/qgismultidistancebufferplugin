@@ -17,58 +17,59 @@ Functionality
 ==================
 
 The **Multi-Distance Buffer** QGIS plugin creates a multi-distance /
-multi-zone / multi-ring vector dataset from an input vector layer
-and a set of distances.
+multi-zone / multi-ring vector (memory) layer from an input vector
+layer and a set of distances.
 
-The resulting dataset consists of one (multi)polygon ("donut type")
+The resulting layer consists of one (multi)polygon ("donut type")
 for each buffer distance.
 The (multi)polygons do not overlap.
-The attribute table of the result dataset will have two columns /
+The attribute table of the result layer will have two columns /
 fields named *distance* and *inner*, that contain the outer (maximum)
 distance and the inner distance for each (multi)polygon.
 For the innermost zone, the value of *inner* is not set.
-The memory layer containing the dataset is added to the QGIS table
-of contents.
+The resulting (memory) layer is added to the QGIS table of contents.
 
-If 100 and 200 are provided as distances, the result dataset will
+If 100 and 200 are provided as distances, the result layer will
 consist of two zones / bands / (multi)polygons - one will contain
 all areas that are within 100 units from the geometries of the input
 vector layer (including the geometries themselves) and will have its
 *distance* field set to 100; the other will contain all areas that
 are from 100 to 200 units from the geometries of the input vector
-layer and will have its *distance* field set to 200.
+layer and will have its *distance* field set to 200, and its *inner*
+field set to 100.
 
-The buffer distances (decimal numbers) can be specified by the user
-in any order.
-The list will be kept numerically sorted by the Plugin.
+  The buffer distances (decimal numbers) can be specified by the user
+  in any order.
+  The list will be kept numerically sorted by the Plugin.
 
-Negative and 0.0 buffer distances are allowed for polygon layers.
-Buffering a polygon with a negative buffer distance means shrinking
-the polygon and is also known as a *setback*.
+  Negative and 0.0 buffer distances are allowed for polygon layers
+  only.
+  Buffering a polygon with a negative buffer distance means shrinking
+  the polygon and is also known as a *setback*.
 
-Buffer distances can be added and removed in the dialogue using the
-*Add*, *Remove* and *Clear* buttons.
-The *Remove* button removes the selected entries, while the *Clear*
-button removes all entries.
-The keyboard can be used to add buffer distances quickly (number
-followed by <enter>).
+  Buffer distances can be added and removed in the dialogue using the
+  *Add*, *Remove* and *Clear all* buttons.
+  The *Remove* button removes the selected entries, while the *Clear*
+  button removes all entries.
+  The keyboard can be used to add individual buffer distances quickly
+  (number followed by <enter>).
 
-Fixed increment buffer distances can be added under **Add multiple
-zones**, specifying the number of zones, the width of each zone and
-the start value.
+  Fixed increment buffer distances can be added under the **Add
+  multiple** tab, specifying the number of zones, the width of each
+  zone and the start value.
 
-A checkbox (*Use only selected features*) can be used to choose to
-only buffer around selected features.
-If the user selects a layer with a selection, the default will be
-set to only use selected features.
-If there is no selection in the chosen layer, the default will be
-set to not only use selected features.
-The user can modify this behaviour with the checkbox.
+  A checkbox (*Selected features only*) can be used to choose to
+  only buffer around selected features.
+  If the user selects a layer with a selection, the default will be
+  set to only use selected features.
+  If there is no selection in the chosen layer, the default will be
+  set to not only use selected features.
+  The user can modify this behaviour by using the checkbox.
 
 Three approaches to buffering are offered by the plugin
 -------------------------------------------------------
 
-*Standard*
+*Standard QGIS buffer operations*
   Will use five segments to represent a quarter circle
   for the buffer geometries in the result dataset.
 
@@ -76,7 +77,7 @@ Three approaches to buffering are offered by the plugin
    :width: 200
 
 *Segments to approximate* (new in version 2.0)
-  The user has to specify the number of segments to use for a quarter
+  The user specifies the number of segments to use for a quarter
   circle.
 
   .. |seg2| image:: illustrations/segments2.png
@@ -93,7 +94,7 @@ Three approaches to buffering are offered by the plugin
   +-------------+--------------+
 
 *Maximum deviation* (new in version 2.0)
-  The user has to provide the maximum radial deviation from the
+  The user provides the maximum radial deviation from the
   specified buffer distances in map units.
   The number of segments per quarter circle is calculated
   based on the buffer distance, and will increase with increasing
