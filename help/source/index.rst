@@ -118,19 +118,19 @@ Implementation
 ==================
 
 The *standard* approach used to use the *buffer* function of
-*QgsGeometryAnalyzer* that does not support the specification of
+*QgsGeometryAnalyzer* that did not support the specification of
 buffer accuracy (segments / arc vertex distance / maximum deviation),
 defaulting to 5 segments.
-In the current implementation it is a special case of "Segments to
+In the current implementation this is a special case of "Segments to
 approximate", using 5 segments for the approximation.
 
-For the other two approaches (added in verion 2.0), the *buffer*
+For the other two approaches (added in version 2.0), the *buffer*
 function of *QgsGeometry* is used, and the resulting buffer
 geometries are combined using the *dissolve* function of
 *QgsGeometry*.
 
-The buffers are combined to form the result multi-distance buffer
-dataset using the *symDifference* function of *QgsGeometry*.
+The buffers are combined to form the multi-distance buffer using the
+*symDifference* function of *QgsGeometry*.
 
 Citation
 ===========
