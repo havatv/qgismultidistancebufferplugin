@@ -137,8 +137,8 @@ Citation
 
 Would you like to cite this plugin?
 
-Tveite, Håvard.  2017.  The QGIS Multi-distance buffer Plugin, Version
-2.2.1.
+Tveite, Håvard.  2018.  The QGIS Multi-distance buffer Plugin, Version
+2.2.2.
 http://plugins.qgis.org/plugins/MultiDistanceBuffer/
 
 

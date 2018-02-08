@@ -125,6 +125,8 @@ class MultiDistanceBuffer:
         self.dlg.iface = self.iface
         self.dlg.progressBar.setValue(0.0)
 
+        # Sort the layers by name
+        layerslist.sort(key=lambda x: x[0], reverse=False)
         # Add the layers to the layers combobox
         self.dlg.inputLayer.clear()
         for layerdescription in layerslist:
