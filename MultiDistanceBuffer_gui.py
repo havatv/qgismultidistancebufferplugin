@@ -29,7 +29,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QThread
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
-from qgis.core import QgsMessageLog
+from qgis.core import QgsMessageLog, Qgis
 from qgis.core import QgsProject, QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.utils import showPluginHelp
@@ -253,19 +253,19 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def showError(self, text):
         """Show an error."""
         QgsMessageLog.logMessage('Error: ' + text, self.MULTIDISTANCEBUFFER,
-                                 QgsMessageLog.CRITICAL)
+                                 Qgis.Critical)
     # end of showError
 
     def showWarning(self, text):
         """Show a warning."""
         QgsMessageLog.logMessage('Warning: ' + text, self.MULTIDISTANCEBUFFER,
-                                 QgsMessageLog.WARNING)
+                                 Qgis.Warning)
     # end of showWarning
 
     def showInfo(self, text):
         """Show info."""
         QgsMessageLog.logMessage('Info: ' + text, self.MULTIDISTANCEBUFFER,
-                                 QgsMessageLog.INFO)
+                                 Qgis.Info)
     # end of showInfo
 
     def giveHelp(self):
