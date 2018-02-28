@@ -93,10 +93,9 @@ class Worker(QtCore.QObject):
 
     # Should @pyqtSlot be used here?
     def run(self):
-        bufferlayers = []
         try:
             layercopy = self.inpvl
-            #self.inpvl = None  # Remove the reference to the layer
+            self.inpvl = None  # Remove the reference to the layer
             if layercopy is None:
                 self.finished.emit(False, None)
                 return
@@ -166,7 +165,6 @@ class Worker(QtCore.QObject):
                         multigeom = multigeom.combine(bgeom)
                     i = i + 1
                     self.calculate_progress()
-                    #QCoreApplication.processEvents() # does not help
                     if self.abort is True:
                         break
                 buffergeomvector.append(multigeom)
@@ -195,28 +193,18 @@ class Worker(QtCore.QObject):
             memresult.reload()
             # Remove references
             layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            bufferlayers = None
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
         except:
             # Remove references
             layercopy = None
-            for outbufflayer in bufferlayers:
-                outbufflayer = None
-            bufferlayers = None
             import traceback
             self.error.emit(traceback.format_exc())
             self.finished.emit(False, None)
             for buffgeom in buffergeomvector:
                 buffgeom = None
             buffergeomvector = None
-            #self.progress = None
-            #self.status = None
-            #self.error = None
-            #self.finished = None
         else:
             if self.abort is True:
                 self.finished.emit(False, None)
@@ -226,10 +214,6 @@ class Worker(QtCore.QObject):
                     memresult = None
                 else:
                     self.finished.emit(False, None)
-            #self.progress = None
-            #self.status = None
-            #self.error = None
-            #self.finished = None
     # end of run
 
     def calculate_progress(self):
