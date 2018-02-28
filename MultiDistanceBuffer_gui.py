@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-#import datetime # Testing... ???
+# import datetime # Testing... ???
 import os
 import glob
 import tempfile
@@ -49,7 +49,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.CANCEL = self.tr('Cancel')
         self.HELP = self.tr('Help')
         self.CLOSE = self.tr('Close')
-        #self.HELP = self.tr('Help')
+        # self.HELP = self.tr('Help')
         self.OK = self.tr('OK')
         super(MultiDistanceBufferDialog, self).__init__(parent)
         self.setupUi(self)
@@ -75,7 +75,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
-        #cancelButton.clicked.connect(self.killWorker)
+        # cancelButton.clicked.connect(self.killWorker)
         helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
@@ -119,8 +119,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 inplayer.crs(), "ESRI Shapefile",
                 selectedonly)
         if error[0]:
-            self.showWarning("Copying the input layer failed! ("
-                             + str(error[0]) + " - " + str(error[1]) + ")")
+            self.showWarning("Copying the input layer failed! (" +
+                             str(error[0]) + " - " + str(error[1]) + ")")
             return
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
@@ -145,7 +145,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Standard means segments to approximate with 5 segments
             segments = 5
 
-        #self.showInfo('Starting worker: ' + str(bufferdistances))
+        # self.showInfo('Starting worker: ' + str(bufferdistances))
         self.worker = Worker(layercopy, bufferdistances,
                       self.workerlayername, selectedonly,
                       segments, deviation)
@@ -154,17 +154,18 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.worker.status.connect(self.workerInfo)
         self.worker.finished.connect(self.workerFinished)
         self.worker.error.connect(self.workerError)
-        self.cancelButton.clicked.connect(self.worker.kill)  # Before movetothread!
+        # Before movetothread!:
+        self.cancelButton.clicked.connect(self.worker.kill)
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.worker.moveToThread(self.thread)  # Before thread.started.connect!
         self.thread.started.connect(self.worker.run)
         self.thread.finished.connect(self.thread.deleteLater)  # Useful?
-        #self.worker.error.connect(self.worker.deleteLater)
-        #self.worker.error.connect(self.thread.quit)
+        # self.worker.error.connect(self.worker.deleteLater)
+        # self.worker.error.connect(self.thread.quit)
         self.thread.start()
-        #self.thread = thread
-        #self.worker = worker  # QT requires this
+        # self.thread = thread
+        # self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -175,11 +176,11 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Handles the output from the worker, adds the generated
            layer to the legend and cleans up after the worker has
            finished."""
-        ## clean up the worker and thread
-        #self.worker.deleteLater()
-        #self.thread.quit()
-        #self.thread.wait()
-        #self.thread.deleteLater()
+        # # clean up the worker and thread
+        # self.worker.deleteLater()
+        # self.thread.quit()
+        # self.thread.wait()
+        # self.thread.deleteLater()
         # For some reason, there are problems with selection
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
@@ -197,7 +198,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # report the result
             result_layer = ret
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
-            #self.layerlistchanging = True
+            # self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
             # A coordinate reference system apparently needs to be
@@ -221,19 +222,20 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateExtents()
             resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.setCrs(result_layer.crs())
-            #resultlayercopy.reload()
+            # resultlayercopy.reload()
             QgsProject.instance().addMapLayer(resultlayercopy)
-            #result_layer.updateExtents()
-            #result_layer.commitChanges()  # should not be necessary
-            #result_layer.setCrs(self.inplayer.crs())
-            #result_layer.moveToThread(self.iface.thread())
-            #QgsProject.instance().addMapLayer(result_layer)
-            #self.iface.mapCanvas().refresh()
-            #self.showInfo("Thread res_lay: " + str(result_layer.thread()) + " - Thread reslaycopy: " + str(resultlayercopy.thread()))
-            #self.showInfo("Thread self.iface: " + str(self.iface.thread()))
+            # result_layer.updateExtents()
+            # result_layer.commitChanges()  # should not be necessary
+            # result_layer.setCrs(self.inplayer.crs())
+            # result_layer.moveToThread(self.iface.thread())
+            # QgsProject.instance().addMapLayer(result_layer)
+            # self.iface.mapCanvas().refresh()
+            # self.showInfo("Thread res_lay: " + str(result_layer.thread()) +
+            #       " - Thread reslaycopy: " + str(resultlayercopy.thread()))
+            # self.showInfo("Thread self.iface: " + str(self.iface.thread()))
             result_layer = None
             resultlayercopy = None
-            ##self.layerlistchanging = False
+            # # self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
@@ -259,9 +261,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def killWorker(self):
         """Kill the worker thread."""
-        #if self.worker is not None:
-        #    self.showInfo('Killing worker')
-        #    self.worker.kill()
+        # if self.worker is not None:
+        #     self.showInfo('Killing worker')
+        #     self.worker.kill()
     # end of killWorker
 
     def showError(self, text):
@@ -283,8 +285,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of showInfo
 
     def giveHelp(self):
-        #QDesktopServices.openUrl(QUrl.fromLocalFile(
-        #                 self.plugin_dir + "/help/html/index.html"))
+        # QDesktopServices.openUrl(QUrl.fromLocalFile(
+        #                  self.plugin_dir + "/help/html/index.html"))
         showPluginHelp(None, "help/html/index")
     # end of giveHelp
 
@@ -311,8 +313,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if thelayer is None:
             return
         # 0.0 is only meaningful for polygons
-        if (buffdist == 0.0
-            and not thelayer.geometryType() == QgsWkbTypes.PolygonGeometry):
+        if (buffdist == 0.0 and not
+              thelayer.geometryType() == QgsWkbTypes.PolygonGeometry):
             self.showInfo(
                 self.tr('Buffer radius 0 is only accepted for polygons'))
             return
@@ -360,7 +362,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def distanceSelectionChanged(self):
         # Event handler
         if (self.bufferList.selectedIndexes() is None or
-            len(self.bufferList.selectedIndexes()) == 0):
+              len(self.bufferList.selectedIndexes()) == 0):
             self.removeButton.setEnabled(False)
         else:
             self.removeButton.setEnabled(True)

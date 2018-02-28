@@ -19,12 +19,12 @@
  *                                                                         *
  ***************************************************************************/
 """
-#import datetime  # Testing... ???
-#import time  # Testing ???
+# import datetime  # Testing... ???
+# import time  # Testing ???
 import math  # for beregning av segments to approximate
 from qgis.core import QgsVectorLayer, QgsFeature
 from qgis.core import QgsField, QgsGeometry
-#from qgis.analysis import QgsGeometryAnalyzer
+# from qgis.analysis import QgsGeometryAnalyzer
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 
@@ -66,7 +66,7 @@ class Worker(QtCore.QObject):
         self.inpvl = inputvectorlayer
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
-        #self.selectedonly = selectedonly
+        # self.selectedonly = selectedonly
         # Creating instance variables for the progress bar ++
         # Number of elements that have been processed - updated by
         # calculate_progress
@@ -139,12 +139,12 @@ class Worker(QtCore.QObject):
                     break
                 self.status.emit(self.tr('Doing buffer distance ') +
                          str(dist) + '... '
-                         #+str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
+                         # +str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
                          )
                 # Determine which buffer variant to use
                 if (self.segments > 0):
                     segments = self.segments
-                    #self.status.emit("Segments")
+                    # self.status.emit("Segments")
                 else:
                     tolerance = self.deviation
                     # Calculate the number of segments per quarter circle
@@ -185,7 +185,7 @@ class Worker(QtCore.QObject):
                 memresult.dataProvider().addFeatures([newfeature])
                 j = j + 1
                 prevdist = dist
-            #self.status.emit(self.tr('Finished with buffer ')
+            # self.status.emit(self.tr('Finished with buffer ')
             #  + str(datetime.datetime.now().strftime('%H:%M:%S.%f')))
 
             # Update the layer extents (after adding features)
