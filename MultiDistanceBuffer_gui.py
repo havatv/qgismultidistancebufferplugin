@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2017 by Håvard Tveite
+        copyright            : (C) 2015-2018 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -91,6 +91,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # Temporary file prefix, for easy removal of temporary files:
         self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
         self.layercopypath = self.tempfilepathprefix + 'copy.shp'
+
+        self.worker = None
     # end of __init__
 
     def startWorker(self):
@@ -101,17 +103,20 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
-        inputlayer = QgsProject.instance().mapLayer(layerId)
+        inplayer = QgsProject.instance().mapLayer(layerId)
         # Should only selected features be considered
         selectedonly = self.selectedOnlyCB.isChecked()
-        if selectedonly and inputlayer.selectedFeatureCount() == 0:
+        if selectedonly and inplayer.selectedFeatureCount() == 0:
             self.showWarning(self.tr("The layer has no selected features!"))
             return
         # Make a copy of the input data set
         # (considering selected features or not)
-        error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
-                self.layercopypath, inputlayer.dataProvider().encoding(),
-                inputlayer.crs(), "ESRI Shapefile",
+        # Could this be done without writing to disk? (would need
+        #   to get the geometry and CSR right and only copy selected
+        #   features)
+        error = QgsVectorFileWriter.writeAsVectorFormat(inplayer,
+                self.layercopypath, inplayer.dataProvider().encoding(),
+                inplayer.crs(), "ESRI Shapefile",
                 selectedonly)
         if error[0]:
             self.showWarning("Copying the input layer failed! ("
@@ -126,6 +131,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 valid = False
         if valid is False:
             self.showWarning("The layer has invalid features!")
+        layercopy.setCrs(inplayer.crs())
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
@@ -137,26 +143,25 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             deviation = self.deviationSB.value()
 
         #self.showInfo('Starting worker: ' + str(bufferdistances))
-        #worker = Worker(layercopy, self.layercopypath, bufferdistances,
-        worker = Worker(None, self.layercopypath, bufferdistances,
+        self.worker = Worker(layercopy, bufferdistances,
                       self.workerlayername, selectedonly,
-                      self.tempfilepathprefix, segments, deviation)
-        thread = QThread(self)
-        worker.progress.connect(self.progressBar.setValue)
-        worker.status.connect(self.workerInfo)
-        worker.finished.connect(self.workerFinished)
-        worker.error.connect(self.workerError)
-        self.cancelButton.clicked.connect(worker.kill)  # Before movetothread!
-        worker.finished.connect(thread.quit)
-        worker.finished.connect(worker.deleteLater)
-        worker.moveToThread(thread)  # Before thread.started.connect!
-        thread.started.connect(worker.run)
-        thread.finished.connect(thread.deleteLater)  # Useful?
-        #worker.error.connect(worker.deleteLater)
-        #worker.error.connect(thread.quit)
-        thread.start()
-        self.thread = thread
-        self.worker = worker  # QT requires this
+                      segments, deviation)
+        self.thread = QThread(self)
+        self.worker.progress.connect(self.progressBar.setValue)
+        self.worker.status.connect(self.workerInfo)
+        self.worker.finished.connect(self.workerFinished)
+        self.worker.error.connect(self.workerError)
+        self.cancelButton.clicked.connect(self.worker.kill)  # Before movetothread!
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.moveToThread(self.thread)  # Before thread.started.connect!
+        self.thread.started.connect(self.worker.run)
+        self.thread.finished.connect(self.thread.deleteLater)  # Useful?
+        #self.worker.error.connect(self.worker.deleteLater)
+        #self.worker.error.connect(self.thread.quit)
+        self.thread.start()
+        #self.thread = thread
+        #self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -186,12 +191,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         except:
             self.showInfo(self.tr('Unable to delete temporary files...'))
         if ok and ret is not None:
-            # get the name of the outputlayer
-            outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            #result_layer.setName(outputlayername) # 2.14
-            #result_layer.setLayerName(outputlayername) # from QGIS 2.16
             self.showInfo(self.tr('MultiDistanceBuffer finished'))
             #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
@@ -202,6 +203,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Use PROJ4 as it should be available for all layers
             crstext = "PROJ4:%s" % result_layer.crs().toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
+            # get the name of the outputlayer
+            outputlayername = self.outputLayerName.text()
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
             # Set the CRS to the original CRS object
@@ -212,14 +215,22 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateFields()
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
-            resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.updateExtents()
-            resultlayercopy.reload()
+            resultlayercopy.commitChanges()  # should not be necessary
+            resultlayercopy.setCrs(result_layer.crs())
+            #resultlayercopy.reload()
             QgsProject.instance().addMapLayer(resultlayercopy)
-            self.iface.mapCanvas().refresh()
+            #result_layer.updateExtents()
+            #result_layer.commitChanges()  # should not be necessary
+            #result_layer.setCrs(self.inplayer.crs())
+            #result_layer.moveToThread(self.iface.thread())
+            #QgsProject.instance().addMapLayer(result_layer)
+            #self.iface.mapCanvas().refresh()
+            #self.showInfo("Thread res_lay: " + str(result_layer.thread()) + " - Thread reslaycopy: " + str(resultlayercopy.thread()))
+            #self.showInfo("Thread self.iface: " + str(self.iface.thread()))
             result_layer = None
             resultlayercopy = None
-            #self.layerlistchanging = False
+            ##self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
