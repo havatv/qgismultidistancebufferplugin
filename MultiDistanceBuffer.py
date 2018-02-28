@@ -28,10 +28,10 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 # Initialize Qt resources from file resources.py
 import sys
+sys.path.append(os.path.dirname(__file__))
 import resources_rc
 # Import the code for the dialog
 from MultiDistanceBuffer_gui import MultiDistanceBufferDialog
-sys.path.append(os.path.dirname(__file__))
 
 
 class MultiDistanceBuffer:
