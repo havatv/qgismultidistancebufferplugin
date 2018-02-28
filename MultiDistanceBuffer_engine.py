@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2017 by Håvard Tveite
+        copyright            : (C) 2015-2018 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -44,23 +44,18 @@ class Worker(QtCore.QObject):
     # Signal for sending back the result:
     finished = QtCore.pyqtSignal(bool, object)
 
-    def __init__(self, inputvectorlayer, inputvectorlayerpath, buffersizes,
-                               outputlayername, selectedonly, tempfilepath,
+    def __init__(self, inputvectorlayer, buffersizes,
+                               outputlayername, selectedonly,
                                segments, deviation):
         """Initialise.
 
         Arguments:
         inputvectorlayer --     (QgsVectorLayer) The base vector
                                 layer for the buffer.
-        inputvectorlayerpath -- Path to the input vector data set
-                                for the buffer.
         buffersizes --          array of floats, sorted asc.
         outputlayername --      Name of the output vector layer.
         selectedonly --         (boolean) Should only selected
                                 features be buffered.  NOT USED!
-        tempfilepath --         path to be used for temporary files
-                                (all files with this prefix will be
-                                deleted when the thread has finished).
         segments --             segments to approximate (apply if > 0).
         deviation --            maximum deviation (apply if > 0.0 and
                                 not segments > 0).
@@ -68,12 +63,10 @@ class Worker(QtCore.QObject):
 
         QtCore.QObject.__init__(self)  # Essential!
         # Creating instance variables from the parameters
-        #self.inpvl = inputvectorlayer
-        self.inputpath = inputvectorlayerpath
+        self.inpvl = inputvectorlayer
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
         #self.selectedonly = selectedonly
-        self.tempfilepath = tempfilepath
         # Creating instance variables for the progress bar ++
         # Number of elements that have been processed - updated by
         # calculate_progress
@@ -93,8 +86,6 @@ class Worker(QtCore.QObject):
         self.distAttrName = 'distance'
         # Inner distance attribute name
         self.innerAttrName = 'inner'
-        # Directories and files
-        self.tmpbuffbasename = self.tempfilepath + 'outbuff'
         # Options
         self.segments = segments
         self.deviation = deviation
@@ -104,16 +95,19 @@ class Worker(QtCore.QObject):
     def run(self):
         bufferlayers = []
         try:
-            #layercopy = self.inpvl
-            layercopy = QgsVectorLayer(self.inputpath, "copy", "ogr")
+            layercopy = self.inpvl
             #self.inpvl = None  # Remove the reference to the layer
             if layercopy is None:
                 self.finished.emit(False, None)
                 return
             pr = layercopy.dataProvider()
             # Remove all the existing attributes:
-            while pr.deleteAttributes([0]):
-                continue
+            thefields = pr.fields()
+            if layercopy.attributeList():
+                while len(layercopy.attributeList()) > 0:
+                    pr.deleteAttributes([0])
+                    layercopy.updateFields()
+
             # Add the distance attributes
             pr.addAttributes([QgsField(self.distAttrName, QVariant.Double)])
             pr.addAttributes([QgsField(self.innerAttrName, QVariant.Double)])
@@ -148,8 +142,6 @@ class Worker(QtCore.QObject):
                          str(dist) + '... '
                          #+str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
                          )
-                outbuffername = self.tmpbuffbasename + str(dist) + '.shp'
-
                 # Determine which buffer variant to use
                 if (self.segments > 0 or self.deviation > 0.0):
                     if (self.segments > 0):
@@ -201,49 +193,6 @@ class Worker(QtCore.QObject):
                     ## parameters: layer, path to output data set,
                     ## distance, selected only, dissolve, attribute index
                     self.status.emit('The buffer variant is not supported!')
-                    #ok = QgsGeometryAnalyzer().buffer(layercopy,
-                    #                outbuffername, dist, False, True, -1)
-                    #if not ok:
-                    #    self.status.emit('The buffer operation failed!')
-                    #blayername = 'buff' + str(dist)
-                    ## Load the buffer data set
-                    #bufflayer = QgsVectorLayer(outbuffername, blayername,
-                    #                           "ogr")
-                    ## Check if the buffer data set is empty
-                    #if bufflayer.featureCount() == 0:
-                    #    continue
-                    #if bufflayer.featureCount() == 1:
-                    #    thefeature = None
-                    #    for f in bufflayer.getFeatures():
-                    #        thefeature = f
-                    #    if (not thefeature) or (thefeature.geometry() is None):
-                    #        continue
-                    ## Set the buffer distance attribute to the current distance
-                    #for feature in bufflayer.getFeatures():
-                    #    attrs = {0: dist, 1: prevdist}  # Set attribute values
-                    #    bufflayer.dataProvider().changeAttributeValues(
-                    #                       {feature.id(): attrs})
-                    #bufferlayers.append(bufflayer)
-                    #bufflayer = None
-                    ## Calculate the current distance band
-                    #if j == 0:     # The innermost buffer, just add it
-                    #    for midfeature in bufferlayers[j].getFeatures():
-                    #        memresult.dataProvider().addFeatures([midfeature])
-                    #else:
-                    #    for outerfeature in bufferlayers[j].getFeatures():
-                    #        # Get the donut by subtracting the inner ring
-                    #        # from this ring
-                    #        outergeom = outerfeature.geometry()
-                    #        for innerfeature in bufferlayers[j - 1].getFeatures():
-                    #            innergeom = innerfeature.geometry()
-                    #            newgeom = outergeom.symDifference(innergeom)
-                    #            outergeom = newgeom
-                    #        newfeature = QgsFeature()
-                    #        newfeature.setGeometry(outergeom)
-                    #        newfeature.setAttributes(outerfeature.attributes())
-                    #        memresult.dataProvider().addFeatures([newfeature])
-                    ## Report progress
-                    #self.calculate_progress()
                 j = j + 1
                 prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
