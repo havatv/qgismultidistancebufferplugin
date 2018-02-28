@@ -141,6 +141,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             segments = self.segmentsSB.value()
         if self.deviationRB.isChecked():
             deviation = self.deviationSB.value()
+        if self.standardRB.isChecked():
+            # Standard means segments to approximate with 5 segments
+            segments = 5
 
         #self.showInfo('Starting worker: ' + str(bufferdistances))
         self.worker = Worker(layercopy, bufferdistances,

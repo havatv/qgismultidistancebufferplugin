@@ -143,56 +143,48 @@ class Worker(QtCore.QObject):
                          #+str(datetime.datetime.now().strftime('%H:%M:%S.%f'))
                          )
                 # Determine which buffer variant to use
-                if (self.segments > 0 or self.deviation > 0.0):
-                    if (self.segments > 0):
-                        segments = self.segments
-                        #self.status.emit("Segments")
-                    else:
-                        tolerance = self.deviation
-                        # Calculate the number of segments per quarter circle
-                        segments = 5
-                        if dist != 0.0:
-                            segments = int(math.pi / (4.0 * math.acos(1.0 -
-                                       (tolerance / float(abs(dist)))))) + 1
-                    segments = max(segments, 1)
-                    multigeom = QgsGeometry()
-                    # Go through the features and buffer and combine the
-                    # feature geometries
-                    i = 0
-                    for feat in layercopy.getFeatures():
-                        bgeom = feat.geometry().buffer(dist, segments)
-                        if i == 0:
-                            multigeom = bgeom
-                        else:
-                            multigeom = multigeom.combine(bgeom)
-                        i = i + 1
-                        self.calculate_progress()
-                        #QCoreApplication.processEvents() # does not help
-                        if self.abort is True:
-                            break
-                    buffergeomvector.append(multigeom)
-
-                    # Compute the donut and add it to the result dataset
-                    newgeom = None
-                    if j == 0:     # Just add the innermost buffer
-                        newgeom = buffergeomvector[j]
-                    else:
-                        # Get the donut by subtracting the inner ring
-                        # from this ring
-                        outergeom = buffergeomvector[j]
-                        innergeom = buffergeomvector[j - 1]
-                        newgeom = outergeom.symDifference(innergeom)
-                    newfeature = QgsFeature()
-                    newfeature.setGeometry(newgeom)
-                    newfeature.setAttributes([dist, prevdist])
-                    memresult.dataProvider().addFeatures([newfeature])
+                if (self.segments > 0):
+                    segments = self.segments
+                    #self.status.emit("Segments")
                 else:
-                    ## With QGIS3, QgsGeometryAnalyzer causes problems
-                    ## The QgsGeometryAnalyzer().buffer operation can only
-                    ## produce a Shapefile format dataset)
-                    ## parameters: layer, path to output data set,
-                    ## distance, selected only, dissolve, attribute index
-                    self.status.emit('The buffer variant is not supported!')
+                    tolerance = self.deviation
+                    # Calculate the number of segments per quarter circle
+                    segments = 5
+                    if dist != 0.0:
+                        segments = int(math.pi / (4.0 * math.acos(1.0 -
+                                   (tolerance / float(abs(dist)))))) + 1
+                segments = max(segments, 1)
+                multigeom = QgsGeometry()
+                # Go through the features and buffer and combine the
+                # feature geometries
+                i = 0
+                for feat in layercopy.getFeatures():
+                    bgeom = feat.geometry().buffer(dist, segments)
+                    if i == 0:
+                        multigeom = bgeom
+                    else:
+                        multigeom = multigeom.combine(bgeom)
+                    i = i + 1
+                    self.calculate_progress()
+                    #QCoreApplication.processEvents() # does not help
+                    if self.abort is True:
+                        break
+                buffergeomvector.append(multigeom)
+
+                # Compute the donut and add it to the result dataset
+                newgeom = None
+                if j == 0:     # Just add the innermost buffer
+                    newgeom = buffergeomvector[j]
+                else:
+                    # Get the donut by subtracting the inner ring
+                    # from this ring
+                    outergeom = buffergeomvector[j]
+                    innergeom = buffergeomvector[j - 1]
+                    newgeom = outergeom.symDifference(innergeom)
+                newfeature = QgsFeature()
+                newfeature.setGeometry(newgeom)
+                newfeature.setAttributes([dist, prevdist])
+                memresult.dataProvider().addFeatures([newfeature])
                 j = j + 1
                 prevdist = dist
             #self.status.emit(self.tr('Finished with buffer ')
