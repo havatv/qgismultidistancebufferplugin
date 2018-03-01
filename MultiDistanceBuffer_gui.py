@@ -6,7 +6,7 @@
                              -------------------
         begin                : 2014-09-04
         git sha              : $Format:%H$
-        copyright            : (C) 2015-2017 by Håvard Tveite
+        copyright            : (C) 2015-2018 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 

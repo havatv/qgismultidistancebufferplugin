@@ -6,7 +6,7 @@
 
                               -------------------
         begin                : 2015-02-05
-        copyright            : (C) 2015 by Håvard Tveite
+        copyright            : (C) 2015-2018 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
@@ -47,10 +47,10 @@ class MultiDistanceBuffer:
                'i18n',
                '{}.qm'.format(locale))
         # initialize locale
-        #localeName = QLocale.system().name()
-        #if QFileInfo(pluginPath).exists():
-        #    self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
-        #                       + localeName + ".qm")
+        # localeName = QLocale.system().name()
+        # if QFileInfo(pluginPath).exists():
+        #     self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
+        #                        + localeName + ".qm")
         if QFileInfo(self.localePath).exists():
             self.translator = QTranslator()
             self.translator.load(self.localePath)

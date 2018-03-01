@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MultiDistanceBuffer'
-copyright = u'2015-2017, Håvard Tveite'
+copyright = u'2015-2018, Håvard Tveite'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
