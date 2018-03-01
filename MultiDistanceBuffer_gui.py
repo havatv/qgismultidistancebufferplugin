@@ -49,7 +49,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.CANCEL = self.tr('Cancel')
         self.HELP = self.tr('Help')
         self.CLOSE = self.tr('Close')
-        # self.HELP = self.tr('Help')
         self.OK = self.tr('OK')
         super(MultiDistanceBufferDialog, self).__init__(parent)
         self.setupUi(self)
@@ -75,7 +74,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
-        # cancelButton.clicked.connect(self.killWorker)
         helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
@@ -118,9 +116,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.layercopypath, inplayer.dataProvider().encoding(),
                 inplayer.crs(), "ESRI Shapefile",
                 selectedonly)
-        if error[0]:
+        if error:
             self.showWarning("Copying the input layer failed! (" +
-                             str(error[0]) + " - " + str(error[1]) + ")")
+                             str(error) + ")")
             return
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
@@ -197,7 +195,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if ok and ret is not None:
             # report the result
             result_layer = ret
-            self.showInfo(self.tr('MultiDistanceBuffer finished'))
+            self.showInfo(self.tr('MultiDistanceBuffer completed'))
             # self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
@@ -235,7 +233,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # self.showInfo("Thread self.iface: " + str(self.iface.thread()))
             result_layer = None
             resultlayercopy = None
-            # # self.layerlistchanging = False
+            # self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
