@@ -44,7 +44,7 @@ class Worker(QtCore.QObject):
     # Signal for sending back the result:
     finished = QtCore.pyqtSignal(bool, object)
 
-    def __init__(self, inputvectorlayer, inputvectorlayerpath, buffersizes,
+    def __init__(self, inputvectorlayer, buffersizes,
                                outputlayername, selectedonly,
                                segments, deviation):
         """Initialise.
@@ -52,8 +52,6 @@ class Worker(QtCore.QObject):
         Arguments:
         inputvectorlayer --     (QgsVectorLayer) The base vector
                                 layer for the buffer.
-        inputvectorlayerpath -- Path to the input vector data set
-                                for the buffer.
         buffersizes --          array of floats, sorted asc.
         outputlayername --      Name of the output vector layer.
         selectedonly --         (boolean) Should only selected
@@ -66,7 +64,6 @@ class Worker(QtCore.QObject):
         QtCore.QObject.__init__(self)  # Essential!
         # Creating instance variables from the parameters
         self.inpvl = inputvectorlayer
-        # self.inputpath = inputvectorlayerpath
         self.buffersizes = buffersizes
         self.outputlayername = outputlayername
         # self.selectedonly = selectedonly

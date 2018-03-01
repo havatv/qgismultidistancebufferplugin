@@ -142,7 +142,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             segments = 5
 
         # self.showInfo('Starting worker: ' + str(bufferdistances))
-        self.worker = Worker(layercopy, self.layercopypath, bufferdistances,
+        self.worker = Worker(layercopy, bufferdistances,
                       self.workerlayername, selectedonly,
                       segments, deviation)
         self.thread = QThread(self)
