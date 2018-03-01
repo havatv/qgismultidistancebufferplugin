@@ -116,9 +116,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.layercopypath, inplayer.dataProvider().encoding(),
                 inplayer.crs(), "ESRI Shapefile",
                 selectedonly)
-        if error:
+        if error[0]:
             self.showWarning("Copying the input layer failed! (" +
-                             str(error) + ")")
+                             str(error[0]) + " - " + str(error[1]) + ")")
             return
         error = None
         layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
