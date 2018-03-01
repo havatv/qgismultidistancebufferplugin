@@ -120,7 +120,7 @@ Implementation
 
 The *buffer* function of *QgsGeometry* is used, and the resulting
 buffer geometries are combined using the *dissolve* function of
- *QgsGeometry*.
+*QgsGeometry*.
 
 The buffers are combined to form the multi-distance buffer using the
 *symDifference* function of *QgsGeometry*.
