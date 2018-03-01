@@ -141,7 +141,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Standard means segments to approximate with 5 segments
             segments = 5
 
-        #self.showInfo('Starting worker: ' + str(bufferdistances))
+        # self.showInfo('Starting worker: ' + str(bufferdistances))
         self.worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       segments, deviation)
@@ -185,10 +185,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if ok and ret is not None:
             # report the result
             result_layer = ret
-            # result_layer.setName(outputlayername) # 2.14
-            # result_layer.setLayerName(outputlayername) # from QGIS 2.16
-            # self.layerlistchanging = True
             self.showInfo(self.tr('MultiDistanceBuffer completed'))
+            # self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
             # A coordinate reference system apparently needs to be
@@ -211,12 +209,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 resultlayercopy.dataProvider().addFeatures([feature])
             resultlayercopy.updateExtents()
             resultlayercopy.commitChanges()  # should not be necessary
+            resultlayercopy.setCrs(result_layer.crs())
             resultlayercopy.reload()
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
             self.iface.mapCanvas().refresh()
             result_layer = None
             resultlayercopy = None
-            #self.layerlistchanging = False
+            # self.layerlistchanging = False
         else:
             # notify the user that something went wrong
             if not ok:
@@ -279,8 +278,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if thelayer is None:
             return
         # 0.0 is only meaningful for polygons
-        if (buffdist == 0.0
-            and not thelayer.geometryType() == QGis.Polygon):
+        if (buffdist == 0.0 and not
+              thelayer.geometryType() == QGis.Polygon):
             self.showInfo(
                 self.tr('Buffer radius 0 is only accepted for polygons'))
             return
@@ -328,7 +327,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def distanceSelectionChanged(self):
         # Event handler
         if (self.bufferList.selectedIndexes() is None or
-            len(self.bufferList.selectedIndexes()) == 0):
+              len(self.bufferList.selectedIndexes()) == 0):
             self.removeButton.setEnabled(False)
         else:
             self.removeButton.setEnabled(True)
