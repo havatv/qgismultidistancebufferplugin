@@ -257,13 +257,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.showInfo(self.tr('Worker: ') + message_string)
     # end of workerInfo
 
-    def killWorker(self):
-        """Kill the worker thread."""
-        # if self.worker is not None:
-        #     self.showInfo('Killing worker')
-        #     self.worker.kill()
-    # end of killWorker
-
     def showError(self, text):
         """Show an error."""
         QgsMessageLog.logMessage('Error: ' + text, self.MULTIDISTANCEBUFFER,
