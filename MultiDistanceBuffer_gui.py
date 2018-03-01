@@ -49,7 +49,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.CANCEL = self.tr('Cancel')
         self.HELP = self.tr('Help')
         self.CLOSE = self.tr('Close')
-        #self.HELP = self.tr('Help')
         self.OK = self.tr('OK')
         super(MultiDistanceBufferDialog, self).__init__(parent)
         self.setupUi(self)
@@ -75,7 +74,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferSB.editingFinished.connect(self.addDistanceEnter)
         # Connect the buttons in the buttonbox
         okButton.clicked.connect(self.startWorker)
-        #cancelButton.clicked.connect(self.killWorker)
         helpButton.clicked.connect(self.giveHelp)
         closeButton.clicked.connect(self.reject)
         # Add handler for layer selection
@@ -101,17 +99,20 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             return
         layerindex = self.inputLayer.currentIndex()
         layerId = self.inputLayer.itemData(layerindex)
-        inputlayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
+        inplayer = QgsMapLayerRegistry.instance().mapLayer(layerId)
         # Should only selected features be considered
         selectedonly = self.selectedOnlyCB.isChecked()
-        if selectedonly and inputlayer.selectedFeatureCount() == 0:
+        if selectedonly and inplayer.selectedFeatureCount() == 0:
             self.showWarning(self.tr("The layer has no selected features!"))
             return
         # Make a copy of the input data set
         # (considering selected features or not)
-        error = QgsVectorFileWriter.writeAsVectorFormat(inputlayer,
-                self.layercopypath, inputlayer.dataProvider().encoding(),
-                inputlayer.crs(), "ESRI Shapefile",
+        # Could this be done without writing to disk? (would need
+        #   to get the geometry and CSR right and only copy selected
+        #   features)
+        error = QgsVectorFileWriter.writeAsVectorFormat(inplayer,
+                self.layercopypath, inplayer.dataProvider().encoding(),
+                inplayer.crs(), "ESRI Shapefile",
                 selectedonly)
         if error:
             self.showWarning("Copying the input layer failed! ("
@@ -126,6 +127,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 valid = False
         if valid is False:
             self.showWarning("The layer has invalid features!")
+        layercopy.setCrs(inplayer.crs())
         bufferdistances = []
         for i in range(self.listModel.rowCount()):
             bufferdistances.append(float(self.listModel.item(i).text()))
@@ -140,25 +142,26 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             segments = 5
 
         #self.showInfo('Starting worker: ' + str(bufferdistances))
-        worker = Worker(layercopy, self.layercopypath, bufferdistances,
+        self.worker = Worker(layercopy, self.layercopypath, bufferdistances,
                       self.workerlayername, selectedonly,
                       segments, deviation)
-        thread = QThread(self)
-        worker.progress.connect(self.progressBar.setValue)
-        worker.status.connect(self.workerInfo)
-        worker.finished.connect(self.workerFinished)
-        worker.error.connect(self.workerError)
-        self.cancelButton.clicked.connect(worker.kill)  # Before movetothread!
-        worker.finished.connect(thread.quit)
-        worker.finished.connect(worker.deleteLater)
-        worker.moveToThread(thread)  # Before thread.started.connect!
-        thread.started.connect(worker.run)
-        thread.finished.connect(thread.deleteLater)  # Useful?
-        #worker.error.connect(worker.deleteLater)
-        #worker.error.connect(thread.quit)
-        thread.start()
-        self.thread = thread
-        self.worker = worker  # QT requires this
+        self.thread = QThread(self)
+        self.worker.progress.connect(self.progressBar.setValue)
+        self.worker.status.connect(self.workerInfo)
+        self.worker.finished.connect(self.workerFinished)
+        self.worker.error.connect(self.workerError)
+        # Before movetothread!:
+        self.cancelButton.clicked.connect(self.worker.kill)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.moveToThread(self.thread)  # Before thread.started.connect!
+        self.thread.started.connect(self.worker.run)
+        self.thread.finished.connect(self.thread.deleteLater)  # Useful?
+        # self.worker.error.connect(self.worker.deleteLater)
+        # self.worker.error.connect(self.thread.quit)
+        self.thread.start()
+        # self.thread = thread
+        # self.worker = worker  # QT requires this
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
@@ -169,25 +172,23 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         """Handles the output from the worker, adds the generated
            layer to the legend and cleans up after the worker has
            finished."""
-        ## clean up the worker and thread
-        #self.worker.deleteLater()
-        #self.thread.quit()
-        #self.thread.wait()
-        #self.thread.deleteLater()
+        # # clean up the worker and thread
+        # self.worker.deleteLater()
+        # self.thread.quit()
+        # self.thread.wait()
+        # self.thread.deleteLater()
         # For some reason, there are problems with selection
         # highlighting if the returned memory layer is added.  To
         # avoid this, a new memory layer is created and features are
         # copied there"""
 
         if ok and ret is not None:
-            # get the name of the outputlayer
-            outputlayername = self.outputLayerName.text()
             # report the result
             result_layer = ret
-            #result_layer.setName(outputlayername) # 2.14
-            #result_layer.setLayerName(outputlayername) # from QGIS 2.16
+            # result_layer.setName(outputlayername) # 2.14
+            # result_layer.setLayerName(outputlayername) # from QGIS 2.16
+            # self.layerlistchanging = True
             self.showInfo(self.tr('MultiDistanceBuffer completed'))
-            #self.layerlistchanging = True
             # Create a (memory) copy of the result layer
             layeruri = 'Polygon?'
             # A coordinate reference system apparently needs to be
@@ -196,6 +197,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             # Use PROJ4 as it should be available for all layers
             crstext = "PROJ4:%s" % result_layer.crs().toProj4()
             layeruri = (layeruri + 'crs=' + crstext)
+            # get the name of the outputlayer
+            outputlayername = self.outputLayerName.text()
             resultlayercopy = QgsVectorLayer(layeruri, outputlayername,
                                                               "memory")
             # Set the CRS to the original CRS object
@@ -206,8 +209,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             resultlayercopy.updateFields()
             for feature in result_layer.getFeatures():
                 resultlayercopy.dataProvider().addFeatures([feature])
-            resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.updateExtents()
+            resultlayercopy.commitChanges()  # should not be necessary
             resultlayercopy.reload()
             QgsMapLayerRegistry.instance().addMapLayer(resultlayercopy)
             self.iface.mapCanvas().refresh()
@@ -237,13 +240,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.showInfo(self.tr('Worker: ') + message_string)
     # end of workerInfo
 
-    def killWorker(self):
-        """Kill the worker thread."""
-        #if self.worker is not None:
-        #    self.showInfo('Killing worker')
-        #    self.worker.kill()
-    # end of killWorker
-
     def showError(self, text):
         """Show an error."""
         QgsMessageLog.logMessage('Error: ' + text, self.MULTIDISTANCEBUFFER,
@@ -263,8 +259,8 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     # end of showInfo
 
     def giveHelp(self):
-        #QDesktopServices.openUrl(QUrl.fromLocalFile(
-        #                 self.plugin_dir + "/help/html/index.html"))
+        # QDesktopServices.openUrl(QUrl.fromLocalFile(
+        #                  self.plugin_dir + "/help/html/index.html"))
         showPluginHelp(None, "help/html/index")
     # end of giveHelp
 
