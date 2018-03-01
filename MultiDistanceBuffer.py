@@ -6,7 +6,7 @@
 
                               -------------------
         begin                : 2015-02-05
-        copyright            : (C) 2015 by Håvard Tveite
+        copyright            : (C) 2015-2018 by Håvard Tveite
         email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
