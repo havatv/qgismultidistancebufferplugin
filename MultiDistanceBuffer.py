@@ -22,39 +22,39 @@
 import os.path
 # Import the PyQt and QGIS libraries
 from qgis.core import QgsProject, QgsMapLayer, QgsWkbTypes
-from qgis.PyQt.QtCore import QFileInfo, QSettings, QCoreApplication
+from qgis.PyQt.QtCore import QSettings, QCoreApplication
 from qgis.PyQt.QtCore import QTranslator, qVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 # Initialize Qt resources from file resources.py
-import sys
-sys.path.append(os.path.dirname(__file__))
-import resources_rc
+from .resources import *
 # Import the code for the dialog
-from MultiDistanceBuffer_gui import MultiDistanceBufferDialog
+from .MultiDistanceBuffer_gui import MultiDistanceBufferDialog
 
 
 class MultiDistanceBuffer:
 
     def __init__(self, iface):
+        """Constructor.
+
+        :param iface: An interface instance that will be passed to this class
+            which provides the hook by which you can manipulate the QGIS
+            application at run time.
+        :type iface: QgsInterface
+        """
         # Save reference to the QGIS interface
         self.iface = iface
-        pluginPath = QFileInfo(os.path.realpath(__file__)).path()
-        # initialize locale using the QGIS locale
-        locale = QSettings().value('locale/userLocale')[0:2]
-        if QFileInfo(pluginPath).exists():
-            self.localePath = os.path.join(
-               pluginPath,
-               'i18n',
-               '{}.qm'.format(locale))
+        # plugin directory
+        pluginPath = os.path.dirname(__file__)
         # initialize locale
-        # localeName = QLocale.system().name()
-        # if QFileInfo(pluginPath).exists():
-        #     self.localePath = (pluginPath + "/i18n/multidistancebuffer_"
-        #                        + localeName + ".qm")
-        if QFileInfo(self.localePath).exists():
+        locale = QSettings().value('locale/userLocale')[0:2]
+        localePath = os.path.join(
+            pluginPath,
+            'i18n',
+            '{}.qm'.format(locale))
+        if os.path.exists(localePath):
             self.translator = QTranslator()
-            self.translator.load(self.localePath)
+            self.translator.load(localePath)
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
         # Create the dialog and keep reference

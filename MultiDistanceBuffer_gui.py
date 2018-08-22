@@ -34,7 +34,7 @@ from qgis.core import QgsProject, QgsWkbTypes
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 from qgis.utils import showPluginHelp
 
-from MultiDistanceBuffer_engine import Worker
+from .MultiDistanceBuffer_engine import Worker
 
 FORM_CLASS, _ = uic.loadUiType(join(
     dirname(__file__), 'ui_multidistancebuffer.ui'))

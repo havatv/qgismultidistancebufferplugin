@@ -51,9 +51,9 @@ UI_FILES = ui_multidistancebuffer.ui
 
 EXTRAS = multidistbuff.png metadata.txt
 
-COMPILED_RESOURCE_FILES = resources_rc.py
+COMPILED_RESOURCE_FILES = resources.py
 
-PEP8EXCLUDE=pydev,resources_rc.py,conf.py,third_party,ui,scripts,plugin_upload.py
+PEP8EXCLUDE=pydev,resources.py,conf.py,third_party,ui,scripts,plugin_upload.py
 
 #################################################
 # Normally you would not need to edit below here
@@ -71,8 +71,8 @@ default: compile
 
 compile: $(COMPILED_RESOURCE_FILES)
 
-%_rc.py : %.qrc $(RESOURCES_SRC)
-	pyrcc5 -o $*_rc.py  $<
+%.py : %.qrc $(RESOURCES_SRC)
+	pyrcc5 -o $*.py  $<
 
 %.qm : %.ts
 	$(LRELEASE) $<
