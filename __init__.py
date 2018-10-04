@@ -21,6 +21,10 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
+__author__ = 'Håvard Tveite'
+__date__ = '2018-10-04'
+__copyright__ = '(C) 2018 by Håvard Tveite'
+
 
 def classFactory(iface):
     # load MultiDistanceBuffer class from file MultiDistanceBuffer

@@ -19,8 +19,21 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+__author__ = 'Håvard Tveite'
+__date__ = '2018-10-04'
+__copyright__ = '(C) 2018 by Håvard Tveite'
+
+# This will get replaced with a git SHA1 when you do a git archive
+
+__revision__ = '$Format:%H$'
+
 import os.path
 # Import the PyQt and QGIS libraries
+# Processing:
+from qgis.core import QgsProcessingAlgorithm, QgsApplication
+
+# Non-Processing
 from qgis.core import QgsProject, QgsMapLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QSettings, QCoreApplication
 from qgis.PyQt.QtCore import QTranslator, qVersion
@@ -30,6 +43,8 @@ from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from .resources import *
 # Import the code for the dialog
 from .MultiDistanceBuffer_gui import MultiDistanceBufferDialog
+# Processing:
+from .MultiDistanceBuffer_provider import MultiDistanceBufferProvider
 
 
 class MultiDistanceBuffer:
@@ -42,6 +57,10 @@ class MultiDistanceBuffer:
             application at run time.
         :type iface: QgsInterface
         """
+        # Processing:
+        self.provider = MultiDistanceBufferProvider()
+
+        # Non-Processing:
         # Save reference to the QGIS interface
         self.iface = iface
         # plugin directory
@@ -77,6 +96,11 @@ class MultiDistanceBuffer:
         return QCoreApplication.translate('MultiDistanceBuffer', message)
 
     def initGui(self):
+
+        # Processing:
+        QgsApplication.processingRegistry().addProvider(self.provider)
+
+        # Non-Processing:
         # Create action that will start plugin configuration
         self.action = QAction(
             QIcon(":/plugins/MultiDistanceBuffer/multidistbuff.png"),
@@ -94,6 +118,7 @@ class MultiDistanceBuffer:
         else:
             self.iface.addPluginToMenu(self.menu, self.action)
 
+
     def unload(self):
         # Remove the plugin menu item
         if hasattr(self.iface, 'removePluginVectorMenu'):
@@ -105,6 +130,10 @@ class MultiDistanceBuffer:
             self.iface.removeVectorToolBarIcon(self.action)
         else:
             self.iface.removeToolBarIcon(self.action)
+
+        # Processing:
+        QgsApplication.processingRegistry().removeProvider(self.provider)
+
 
     # run method that performs all the real work
     def run(self):

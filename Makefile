@@ -45,7 +45,9 @@ PLUGINNAME = MultiDistanceBuffer
 PY_FILES = MultiDistanceBuffer.py \
            MultiDistanceBuffer_gui.py \
            __init__.py \
-           MultiDistanceBuffer_engine.py
+           MultiDistanceBuffer_engine.py \
+           MultiDistanceBuffer_provider.py \
+           MultiDistanceBuffer_algorithm.py
 
 UI_FILES = ui_multidistancebuffer.ui
 
