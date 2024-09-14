@@ -124,7 +124,7 @@ class MultiDistanceBuffer:
                self.tr('Vector layers not found'))
             return
         self.dlg.iface = self.iface
-        self.dlg.progressBar.setValue(0.0)
+        self.dlg.progressBar.setValue(0)
 
         # Sort the layers by name
         layerslist.sort(key=lambda x: x[0], reverse=False)

@@ -38,7 +38,7 @@ class Worker(QtCore.QObject):
     */
     '''
     # Define the signals used to communicate back to the application
-    progress = QtCore.pyqtSignal(float)  # For reporting progress
+    progress = QtCore.pyqtSignal(int)  # For reporting progress
     status = QtCore.pyqtSignal(str)      # For reporting status
     error = QtCore.pyqtSignal(str)       # For reporting errors
     # Signal for sending back the result:
@@ -225,7 +225,7 @@ class Worker(QtCore.QObject):
             perc_new = (self.processed * 100) / self.worktodo
             if perc_new > self.percentage:
                 self.percentage = perc_new
-                self.progress.emit(self.percentage)
+                self.progress.emit(int(self.percentage))
     # end of calculate_progress
 
     def kill(self):

@@ -240,7 +240,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.showError(self.tr('Aborted') + '!')
             else:
                 self.showError(self.tr('No layer created') + '!')
-        self.progressBar.setValue(0.0)
+        self.progressBar.setValue(0)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
         self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
@@ -383,7 +383,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 else:
                     i = i + 1
             if self.startSB.value() <= 0.0:
-                self.startSB.setValue(100.0)
+                self.startSB.setValue(100)
             # Disable the OK button if no buffer distances are specified
             if self.listModel.rowCount() == 0:
                 self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
