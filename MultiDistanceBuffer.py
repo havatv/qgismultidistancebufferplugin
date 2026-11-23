@@ -26,8 +26,6 @@ from qgis.PyQt.QtCore import QSettings, QCoreApplication
 from qgis.PyQt.QtCore import QTranslator, qVersion
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
-# Initialize Qt resources from file resources.py
-from .resources import *
 # Import the code for the dialog
 from .MultiDistanceBuffer_gui import MultiDistanceBufferDialog
 
@@ -79,7 +77,7 @@ class MultiDistanceBuffer:
     def initGui(self):
         # Create action that will start plugin configuration
         self.action = QAction(
-            QIcon(":/plugins/MultiDistanceBuffer/multidistbuff.png"),
+            QIcon(os.path.join(os.path.dirname(__file__), "multidistbuff.png")),
             u"MultiDistanceBuffer", self.iface.mainWindow())
         # connect the action to the run method
         self.action.triggered.connect(self.run)
@@ -124,7 +122,7 @@ class MultiDistanceBuffer:
                self.tr('Vector layers not found'))
             return
         self.dlg.iface = self.iface
-        self.dlg.progressBar.setValue(0.0)
+        self.dlg.progressBar.setValue(0)
 
         # Sort the layers by name
         layerslist.sort(key=lambda x: x[0], reverse=False)

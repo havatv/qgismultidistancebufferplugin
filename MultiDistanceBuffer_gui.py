@@ -53,15 +53,15 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         super(MultiDistanceBufferDialog, self).__init__(parent)
         self.setupUi(self)
         # Initialise som local variables and set translations
-        okButton = self.buttonBox.button(QDialogButtonBox.Ok)
+        okButton = self.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
         okButton.setText(self.OK)
         okButton.setEnabled(False)
-        self.cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
+        self.cancelButton = self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
         self.cancelButton.setText(self.CANCEL)
         self.cancelButton.setEnabled(False)
         helpButton = self.helpButton
         helpButton.setText(self.HELP)
-        closeButton = self.buttonBox.button(QDialogButtonBox.Close)
+        closeButton = self.buttonBox.button(QDialogButtonBox.StandardButton.Close)
         closeButton.setText(self.CLOSE)
         self.removeButton.setEnabled(False)
         self.clearButton.setEnabled(False)
@@ -164,9 +164,9 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.thread.start()
         # self.thread = thread
         # self.worker = worker  # QT requires this
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-        self.buttonBox.button(QDialogButtonBox.Close).setEnabled(False)
-        self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Close).setEnabled(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setEnabled(True)
         layercopy = None
     # end of startWorker
 
@@ -240,10 +240,10 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.showError(self.tr('Aborted') + '!')
             else:
                 self.showError(self.tr('No layer created') + '!')
-        self.progressBar.setValue(0.0)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-        self.buttonBox.button(QDialogButtonBox.Close).setEnabled(True)
-        self.buttonBox.button(QDialogButtonBox.Cancel).setEnabled(False)
+        self.progressBar.setValue(0)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Close).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setEnabled(False)
     # end of workerFinished
 
     def workerError(self, exception_string):
@@ -321,7 +321,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                     return
         item = QStandardItem(str(buffdist))
         self.listModel.appendRow(item)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
         self.clearButton.setEnabled(True)
     # end of addDistance
 
@@ -386,7 +386,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
                 self.startSB.setValue(100.0)
             # Disable the OK button if no buffer distances are specified
             if self.listModel.rowCount() == 0:
-                self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+                self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         # Check if there is a selection and update the "use only
         # selected features" checkbox accordingly
         if thelayer.selectedFeatureCount() == 0:
@@ -404,7 +404,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
             self.listModel.removeRow(indexes[i].row())
         self.bufferList.setUpdatesEnabled(True)
         if self.listModel.rowCount() == 0:
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
             self.clearButton.setEnabled(False)
         self.removeButton.setEnabled(False)
     # end of removeDistance
@@ -414,7 +414,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         self.bufferList.setUpdatesEnabled(False)
         self.listModel.removeRows(0, self.listModel.rowCount())
         self.bufferList.setUpdatesEnabled(True)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         self.removeButton.setEnabled(False)
         self.clearButton.setEnabled(False)
     # end of clearDistance

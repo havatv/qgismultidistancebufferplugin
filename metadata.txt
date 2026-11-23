@@ -2,7 +2,7 @@
 name=Multi-distance buffer
 version=3.2.4
 qgisMinimumVersion=2.99
-qgisMaximumVersion=3.99
+qgisMaximumVersion=4.99
 description=Create multiple distance buffers
 author=Håvard Tveite, NMBU
 email=havard.tveite@nmbu.no

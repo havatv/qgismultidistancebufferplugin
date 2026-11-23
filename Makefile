@@ -51,9 +51,7 @@ UI_FILES = ui_multidistancebuffer.ui
 
 EXTRAS = multidistbuff.png metadata.txt
 
-COMPILED_RESOURCE_FILES = resources.py
-
-PEP8EXCLUDE=pydev,resources.py,conf.py,third_party,ui,scripts,plugin_upload.py
+PEP8EXCLUDE=pydev,conf.py,third_party,ui,scripts,plugin_upload.py
 
 #################################################
 # Normally you would not need to edit below here
@@ -63,16 +61,11 @@ HELP = help/build/html
 
 PLUGIN_UPLOAD = $(c)/plugin_upload.py
 
-RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
-
 QGISDIR=.local/share/QGIS/QGIS3/profiles/default
 
 default: compile
 
-compile: $(COMPILED_RESOURCE_FILES)
-
-%.py : %.qrc $(RESOURCES_SRC)
-	pyrcc5 -o $*.py  $<
+compile:
 
 %.qm : %.ts
 	$(LRELEASE) $<
@@ -102,7 +95,6 @@ deploy: compile doc transcompile
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
-	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
@@ -196,9 +188,9 @@ transclean:
 clean:
 	@echo
 	@echo "------------------------------------"
-	@echo "Removing uic and rcc generated files"
+	@echo "Removing uic generated files"
 	@echo "------------------------------------"
-	rm $(UI_FILES) $(COMPILED_RESOURCE_FILES)
+	rm $(UI_FILES)
 
 # build documentation with sphinx
 doc: 
