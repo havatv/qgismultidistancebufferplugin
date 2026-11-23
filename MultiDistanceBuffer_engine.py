@@ -31,8 +31,7 @@ from qgis.PyQt.QtCore import QCoreApplication, QVariant
 
 class Worker(QtCore.QObject):
     '''The worker that does the heavy lifting.
-    /* Leaves temporary files that should be deleted by the caller.
-     * Removes all attributes of the input layer and adds a distance
+    /* Removes all attributes of the input layer and adds a distance
      * attribute.
      *
     */

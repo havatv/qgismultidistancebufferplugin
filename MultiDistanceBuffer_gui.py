@@ -20,10 +20,6 @@
  ***************************************************************************/
 """
 # import datetime # Testing... ???
-import os
-import glob
-import tempfile
-import uuid
 from os.path import dirname, join
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QThread
@@ -31,7 +27,7 @@ from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.core import QgsMessageLog, Qgis
 from qgis.core import QgsProject, QgsWkbTypes
-from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsVectorLayer
 from qgis.utils import showPluginHelp
 
 from .MultiDistanceBuffer_engine import Worker
@@ -85,10 +81,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         blSelModel = self.bufferList.selectionModel()
         blSelModel.selectionChanged.connect(self.distanceSelectionChanged)
         self.workerlayername = 'mdblayer'
-        self.tmpdir = tempfile.gettempdir()
-        # Temporary file prefix, for easy removal of temporary files:
-        self.tempfilepathprefix = self.tmpdir + '/MDBtemp'
-        self.layercopypath = self.tempfilepathprefix + 'copy.shp'
 
         self.worker = None
     # end of __init__
@@ -107,21 +99,13 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         if selectedonly and inplayer.selectedFeatureCount() == 0:
             self.showWarning(self.tr("The layer has no selected features!"))
             return
-        # Make a copy of the input data set
-        # (considering selected features or not)
-        # Could this be done without writing to disk? (would need
-        #   to get the geometry and CSR right and only copy selected
-        #   features)
-        error = QgsVectorFileWriter.writeAsVectorFormat(inplayer,
-                self.layercopypath, inplayer.dataProvider().encoding(),
-                inplayer.crs(), "ESRI Shapefile",
-                selectedonly)
-        if error[0]:
-            self.showWarning("Copying the input layer failed! (" +
-                             str(error[0]) + " - " + str(error[1]) + ")")
+        request = QgsFeatureRequest()
+        if selectedonly:
+            request.setFilterFids(inplayer.selectedFeatureIds())
+        layercopy = inplayer.materialize(request)
+        if not layercopy.isValid():
+            self.showWarning("Copying the input layer failed!")
             return
-        error = None
-        layercopy = QgsVectorLayer(self.layercopypath, "copy", "ogr")
         # Check if the geometries of the layer are valid
         valid = True
         for feature in layercopy.getFeatures():
@@ -172,8 +156,7 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
 
     def workerFinished(self, ok, ret):
         """Handles the output from the worker, adds the generated
-           layer to the legend and cleans up after the worker has
-           finished."""
+           layer to the legend."""
         # # clean up the worker and thread
         # self.worker.deleteLater()
         # self.thread.quit()
@@ -184,14 +167,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
         # avoid this, a new memory layer is created and features are
         # copied there"""
 
-        # Remove temporary files
-        try:
-            copypattern = self.tempfilepathprefix + '*'
-            tmpfiles = glob.glob(copypattern)
-            for tmpfile in tmpfiles:
-                os.remove(tmpfile)
-        except:
-            self.showInfo(self.tr('Unable to delete temporary files...'))
         if ok and ret is not None:
             # report the result
             result_layer = ret
@@ -284,14 +259,6 @@ class MultiDistanceBufferDialog(QDialog, FORM_CLASS):
     def reject(self):
         """Reject override."""
         # exits the dialog
-        # Removes all temporary files
-        try:
-            copypattern = self.tempfilepathprefix + '*'
-            tmpfiles = glob.glob(copypattern)
-            for tmpfile in tmpfiles:
-                os.remove(tmpfile)
-        except:
-            self.showInfo('Unable to delete temporary files...')
         self.listModel.clear()
         QDialog.reject(self)
     # end of reject
